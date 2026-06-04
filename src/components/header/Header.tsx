@@ -1,14 +1,11 @@
-
-
+import ThemeToggle from "@/components/header/ThemeToggle";
 
 export const Header = () => {
     return (
-        <>
-            <div className="min-w-screen bg-blue-500 h-24">
-                <div className="w-full h-full text-center">
-                    <h1 className="color-red">Test text</h1>
-                </div> 
+        <header className="min-w-screen bg-mint-500 h-24 flex">
+            <div className="w-full h-full flex flex-row">
+              <ThemeToggle />
             </div>
-        </>
+        </header>
     )
 }
