@@ -10,9 +10,9 @@ export default function ThemeToggle() {
     <button
       onClick={toggle}
       aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
-      className="rounded-lg m-2 bg-red-200 hover:bg-red-300 dark:bg-blue-200"
+      className="m-2 transition-all duration-300 hover:scale-110 hover:cursor-pointer"
     >
-      {isDark ? <IoSunnyOutline/> : <IoMoonOutline/>}
+      {isDark ? <IoSunnyOutline className="h-6 w-6"/> : <IoMoonOutline className="h-6 w-6"/>}
     </button>
   )
 }
