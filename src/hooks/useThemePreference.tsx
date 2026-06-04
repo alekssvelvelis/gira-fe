@@ -17,6 +17,14 @@ export function useThemePreference(): [Theme, () => void] {
     localStorage.setItem('theme', theme);
   }, [theme])
 
+      useEffect(() => {
+  const root = document.documentElement;
+  root.classList.toggle('dark', theme === 'dark');
+  console.log('html classes:', root.className); // 👈
+  localStorage.setItem('theme', theme);
+  console.log(localStorage.getItem('theme'));
+}, [theme])
+
   const toggle = () => setTheme(theme => (theme === 'dark' ? 'light' : 'dark'));
 
   return [theme, toggle];

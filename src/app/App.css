@@ -6,6 +6,7 @@
   --color-secondary: #9acfdf;
   --color-accent: #62bad5;
   --color-surface: #f5fafa;
+  --color-darkened-surface: #b9baaa;
 }
 
 @layer base {
@@ -15,6 +16,7 @@
     --color-secondary: #9acfdf;
     --color-accent: #62bad5;
     --color-surface: #f5fafa;
+    --color-darkened-surface: #ffffff;
   }
 
   /* Dark mode overrides */
@@ -23,6 +25,7 @@
     --color-secondary: #205565;
     --color-accent: #2a829d;
     --color-surface: #050a0a;
+    --color-darkened-surface: #101919;
   }
 
   body {
