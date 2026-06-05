@@ -23,7 +23,7 @@ export const LoginView = () => {
     const handleTestLogin = () => {
         const testToken = `test-token-${Date.now()}`;
         saveUser(testToken);
-        navigate('/dashboard');
+        navigate('/calendar');
     };
 
     const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {

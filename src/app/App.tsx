@@ -4,9 +4,13 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { LoginView } from '@/views/authentication/LoginView';
 import { RegisterView } from '@/views/authentication/RegisterView';
 import { Dashboard } from '@/views/main/Dashboard';
+import { Calendar } from '@/views/main/Calendar';
+
 import ProtectedRoute from '@/components/authentication/ProtectedRoute';
-import { DashboardLayout } from '@/components/layouts/DashboardLayout';
+import { SidebarLayout } from '@/components/layouts/SidebarLayout';
+
 import { AuthProvider } from '@/context/AuthContext';
+
 export default function App() {
   return (
     <AuthProvider>
@@ -15,16 +19,25 @@ export default function App() {
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<LoginView />} />
           <Route path="/register" element={<RegisterView />} />
+
           <Route path="/dashboard" element={
             <ProtectedRoute>
-              <DashboardLayout>
+              <SidebarLayout>
                 <Dashboard />
-              </DashboardLayout>
+              </SidebarLayout>
+            </ProtectedRoute>
+          } />
+
+          <Route path="/calendar" element={
+            <ProtectedRoute>
+              <SidebarLayout>
+                <Calendar />
+              </SidebarLayout>
             </ProtectedRoute>
           } />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
-  )
+  );
 }
 
