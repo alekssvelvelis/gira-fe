@@ -4,7 +4,9 @@
 
 export type TaskStatus   = "open" | "started" | "review" | "finished" | "blocked";
 export type TaskType     = "feat" | "bug" | "refactor";
-export type TaskPriority = 1 | 2 | 3 | 4 | 5;
+export type TaskPriority = 1 | 2 | 3 | 4 | 5
+
+
 
 export interface Task {
   task_id:          string;
@@ -43,11 +45,27 @@ export interface Project {
 //  Organizations
 // ─────────────────────────────────────────────
 
+export const STATUS_OPTIONS = [
+    { value: "open", label: "Open", dot: "bg-gray-400", color: "text-gray-600" },
+    { value: "started", label: "Started", dot: "bg-blue-500", color: "text-blue-700" },
+    { value: "review", label: "In Review", dot: "bg-yellow-500", color: "text-yellow-700" },
+    { value: "finished", label: "Finished", dot: "bg-green-500", color: "text-green-700" },
+    { value: "blocked", label: "Blocked", dot: "bg-red-500", color: "text-red-700" },
+];
+
 export const TASK_TYPE_CLASSES: Record<TaskType, string> = {
   feat:     "text-green-700 bg-green-100 ring-green-600/20",
   bug:      "text-red-700   bg-red-100   ring-red-600/20",
   refactor: "text-blue-700  bg-blue-100  ring-blue-600/20",
 };
+
+export const PRIORITIES = [
+    { value: 1, label: "1 - Lowest" },
+    { value: 2, label: "2 - Low" },
+    { value: 3, label: "3 - Medium" },
+    { value: 4, label: "4 - High" },
+    { value: 5, label: "5 - Immediate" },
+];
 
 export const ORGANIZATIONS: Record<string, Organization> = {
   "org-001": {

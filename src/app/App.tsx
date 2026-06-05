@@ -7,6 +7,7 @@ import { Dashboard } from '@/views/main/Dashboard';
 import { Calendar } from '@/views/main/Calendar';
 
 import { TaskView } from '@/views/tasks/TaskView';
+import { TaskEditView } from '@/views/tasks/TaskEditView';
 
 import ProtectedRoute from '@/components/authentication/ProtectedRoute';
 import { SidebarLayout } from '@/components/layouts/SidebarLayout';
@@ -29,6 +30,7 @@ export default function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/calendar" element={<Calendar />} />
             <Route path="/task/:projectId/:taskId" element={<TaskView />} />
+            <Route path="/task/:projectId/:taskId/edit" element={<TaskEditView />} />
           </Route>
         </Routes>
       </BrowserRouter>

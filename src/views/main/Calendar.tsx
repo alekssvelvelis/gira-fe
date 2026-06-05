@@ -23,15 +23,15 @@ export const Calendar = () => {
 
     const navigate = useNavigate();
     return (
-        <div className='min-w-full min-h-full p-2 bg-secondary flex md:flex-col flex-wrap'>
+        <div className='min-w-full min-h-full p-2 bg-darkened-surface flex md:flex-col flex-wrap'>
             <div className='md:w-full flex flex-col gap-6 overflow-x-scroll'>
-                <h1>Your calendar</h1>
+                <h1 className='text-3xl font-light'>Your calendar</h1>
 
                 {sortedMonths.map(month => (
                     <div key={month}>
                         <h2 className='text-xl font-semibold mb-2'>{formatYearMonth(month)}</h2>
                         <table className='min-w-full text-lg border'>
-                            <thead className='bg-accent border-b border-primary'>
+                            <thead className='bg-primary border-b border-primary'>
                                 <tr>
                                     <th scope='col' className='w-1/5 px-3 py-2 text-left font-medium'>Task ID</th>
                                     <th scope='col' className='w-1/5 px-3 py-2 text-left font-medium'>Status</th>

@@ -7,16 +7,16 @@ export const Dashboard = () => {
     const [userTasks, setUserTasks] = useState({});
     const tasks = Object.values(TASKS).filter(t => t.user_id === 'usr-006');
     return(
-        <div className='min-w-full flex flex-col min-h-screen'>
-            <div className='min-w-full h-[10%] p-2 bg-primary justify-between flex flex-wrap' id='dashboard-header'>
-                <h1 className='text-3xl md:text-xl sm:text-sm font-light'>Dashboard</h1>
-                <h1 className='text-3xl md:text-xl sm:text-sm font-light'>Welcome back, user!</h1>
+        <div className='min-w-full min-h-full p-2 bg-darkened-surface flex md:flex-col flex-wrap'>
+            <div className='min-w-full h-[10%] justify-between flex flex-wrap' id='dashboard-header'>
+                <h1 className='text-3xl font-light'>Dashboard</h1>
+                <h1 className='text-3xl font-light'>Welcome back, user!</h1>
             </div>
-            <div className='min-w-full min-h-full p-2 bg-secondary flex md:flex-col flex-wrap'>
+            <div className='min-w-full min-h-full bg-surface flex md:flex-col flex-wrap'>
                 <div className='md:w-full flex flex-col overflow-x-scroll'>
                     <h1>Your upcoming tasks</h1>
                     <table className="min-w-full text-lg border">
-                        <thead className="bg-accent border-b border-primary">
+                        <thead className="bg-primary border-b border-primary">
                             <tr>
                                 <th scope="col" className="w-1/5 px-3 py-2 text-left font-medium">Task ID</th>
                                 <th scope="col" className="w-1/5 px-3 py-2 text-left font-medium">Status</th>

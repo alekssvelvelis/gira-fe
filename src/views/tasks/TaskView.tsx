@@ -18,7 +18,7 @@ export const TaskView = () => {
     const badgeClass = TASK_TYPE_CLASSES[task.task_type];
 
     return (
-        <div className='relative min-h-full bg-secondary p-4 md:p-6'>
+        <div className='relative min-h-full bg-darkened-surface p-4 md:p-6'>
             <div className='flex items-center justify-between pb-3 border-b border-border mb-5'>
                 <div className='flex items-center gap-3'>
                     <button
@@ -69,7 +69,7 @@ export const TaskView = () => {
         </div>
 
             <button
-                onClick={() => navigate(`edit`)}
+                onClick={() => navigate(`/task/${task.project_id}/${task.task_id}/edit`)}
                 className='absolute bottom-5 right-5 flex items-center gap-1.5 bg-accent p-2 rounded-lg items-center duration-300 transition-all hover:cursor-pointer hover:bg-primary'
             >
                 <FiEdit2 className='h-6 w-6' />
