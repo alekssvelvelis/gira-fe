@@ -27,7 +27,7 @@ export const Dashboard = () => {
                         </thead>
                         <tbody className='divide-y divide-accent'>
                             {tasks.map(task => (
-                                <tr key={task.task_id} className='hover:bg-accent transition-colors last:border-b-0 hover:cursor-pointer' onClick={() => navigate(`${task.project_id}/${task.task_id}`)}>
+                                <tr key={task.task_id} className='hover:bg-accent transition-colors last:border-b-0 hover:cursor-pointer' onClick={() => navigate(`/task/${task.project_id}/${task.task_id}`)}>
                                     <td>{task.task_id}</td>
                                     <td>{task.status}</td>
                                     <td>{task.priority}</td>

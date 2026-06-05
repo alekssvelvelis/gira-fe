@@ -213,9 +213,8 @@ export const TaskEditView = () => {
                     </div>
                         <button
                             type='submit' id='edit-task-form-submit'
-                            className='flex items-center gap-1.5 bg-green-500 p-2 rounded-lg items-center duration-300 transition-all hover:cursor-pointer hover:bg-green-600'
+                            className='flex justify-center text-center gap-1.5 bg-green-500 p-2 rounded-lg items-center duration-300 transition-all hover:cursor-pointer hover:bg-green-600'
                         >
-                        <FiEdit2 className='h-6 w-6' />
                             Save task
                         </button>
                 </form>
