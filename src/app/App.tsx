@@ -8,6 +8,7 @@ import { Calendar } from '@/views/main/Calendar';
 
 import { TaskView } from '@/views/tasks/TaskView';
 import { TaskEditView } from '@/views/tasks/TaskEditView';
+import { MemberView } from '@/views/organization/MembersView';
 
 import ProtectedRoute from '@/components/authentication/ProtectedRoute';
 import { SidebarLayout } from '@/components/layouts/SidebarLayout';
@@ -31,7 +32,7 @@ export default function App() {
             <Route path="/calendar" element={<Calendar />} />
             <Route path="/task/:projectId/:taskId" element={<TaskView />} />
             <Route path="/task/:projectId/:taskId/edit" element={<TaskEditView />} />
-            <Route path="/:orgId/members" element={<TaskView />} />
+            <Route path="/:orgId/members" element={<MemberView />} />
           </Route>
         </Routes>
       </BrowserRouter>
