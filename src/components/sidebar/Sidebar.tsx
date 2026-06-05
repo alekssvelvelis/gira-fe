@@ -27,20 +27,21 @@ export const Sidebar = () => {
                 onClick={() => setSidebarShown(false)}
             />
         )}
-            {/* <nav className={`min-h-screen max-h-screen sticky bg-accent flex flex-col overflow-hidden transition-all duration-300 ${sidebarShown ? 'w-48' : 'w-10'}`}> */}
-            <nav className={`
+            <nav 
+                className={`
                     h-screen flex-shrink-0 bg-accent flex flex-col overflow-hidden
                     transition-all duration-300
                     ${isMobile
                         ? `fixed z-20 w-48 ${sidebarShown ? 'translate-x-0' : '-translate-x-38'}`
                         : `sticky top-0 ${sidebarShown ? 'w-48' : 'w-10'}`
                     }
-                `}>
+                `}
+            >
                 {/* width in tailwind is calculated as w-{number * 0.25rem}, therefore w-48 = 12rem and w-10 = 2.5rem. REM is the default, so use rem for calculations */}
-                {/* <div className={`w-48 flex flex-col flex-1 transition-all duration-300 ${sidebarShown ? 'translate-x-0' : '-translate-x-[calc(12rem-2.5rem)]'}`}> */}
                 <div className={`w-48 flex flex-col flex-1 transition-all duration-300 ${
                     !isMobile && !sidebarShown ? '-translate-x-[calc(12rem-2.5rem)]' : 'translate-x-0'
-                }`}>
+                }`}
+                >
                     <div className='w-full max-h-16 bg-accent flex flex-row items-center'>
                         <div className='w-1/2 mx-2'>
                             <h1 className='text-2xl font-light uppercase'>Gira</h1>
@@ -64,7 +65,7 @@ export const Sidebar = () => {
                                 {section.items.map(item => (
                                     <a
                                         key={item.label}
-                                        className='w-full max-h-16 flex flex-row items-center duration-300 transition-all hover:cursor-pointer hover:bg-secondary'
+                                        className='w-full max-h-16 flex flex-row text-sidebar-text items-center duration-300 transition-all hover:cursor-pointer hover:bg-secondary'
                                         id={item.label}
                                         href={item.href}
                                     >

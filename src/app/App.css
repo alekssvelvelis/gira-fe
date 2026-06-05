@@ -6,7 +6,8 @@
   --color-secondary: #9acfdf;
   --color-accent: #62bad5;
   --color-surface: #f5fafa;
-  --color-darkened-surface: #b9baaa;
+  --color-darkened-surface: #ffffff;
+  --color-sidebar-text: oklch(96.7% 0.003 264.542);
 }
 
 @layer base {
@@ -17,6 +18,7 @@
     --color-accent: #62bad5;
     --color-surface: #f5fafa;
     --color-darkened-surface: #ffffff;
+    --color-sidebar-text: oklch(21% 0.034 264.665);
   }
 
   /* Dark mode overrides */
@@ -26,6 +28,7 @@
     --color-accent: #2a829d;
     --color-surface: #050a0a;
     --color-darkened-surface: #101919;
+    --color-sidebar-text: oklch(96.7% 0.003 264.542);
   }
 
   body {
