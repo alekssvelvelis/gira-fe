@@ -31,6 +31,7 @@ export default function App() {
             <Route path="/calendar" element={<Calendar />} />
             <Route path="/task/:projectId/:taskId" element={<TaskView />} />
             <Route path="/task/:projectId/:taskId/edit" element={<TaskEditView />} />
+            <Route path="/:orgId/members" element={<TaskView />} />
           </Route>
         </Routes>
       </BrowserRouter>

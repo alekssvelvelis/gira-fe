@@ -3,8 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { TASKS, USERS, PROJECTS, STATUS_OPTIONS, PRIORITIES} from "@/constants/dummy-data";
 import { GoArrowLeft } from "react-icons/go";
-import { FiEdit2 } from "react-icons/fi";
-
+import { FormField } from '@/components/input/FormField';
 interface TaskEditErrors {
     DescriptionError: string,
     AssignedUserError: string,
@@ -112,104 +111,64 @@ export const TaskEditView = () => {
             </div>
                 <form id='task-edit-form' className='flex flex-col w-full gap-4' onSubmit={(handleSubmit)}>
                     <div id='task-edit-description' className='flex flex-col'>
-                        <label htmlFor='task-edit-description-input' className='mb-2'>Task Description:</label>
-                        <textarea 
-                            id='task-edit-description-input' 
-                            name='task-edit-description-input' 
+                        <FormField
+                            name='task-edit-description-input'
+                            label='Task Description:'
                             value={taskDescription}
-                            onChange={(e) => setTaskDescription(e.target.value)}
-                            className={`px-3 py-2 border rounded bg-surface ${errors.DescriptionError ? 'border-red-500' : 'border-gray-300'}`}
+                            onChange={setTaskDescription}
+                            config={{type: 'textarea', rows: 4}}
+                            placeholder='Enter task description...'
+                            error={errors.DescriptionError}
                         />
-                        {errorMsg(errors.DescriptionError)}
 
-                        <div className="flex flex-col">
-                            <label htmlFor="task-assigned-user-input" className="mb-2 font-medium text-sm">
-                            Assigned User
-                            </label>
-                            <select
-                            id="task-assigned-user-input"
-                            name="task-assigned-user-input"
+                        <FormField
+                            name="assignedUser"
+                            label="Assigned User"
                             value={assignedUser}
-                            onChange={(e) => setAssignedUser(e.target.value)}
-                            className={`px-3 py-2 border rounded bg-surface ${errors.AssignedUserError ? 'border-red-500' : 'border-gray-300'}`}
-                            >
-                                <option value="" disabled>Select a user…</option>
-                                {orgUsers.map((user) => (
-                                    <option key={user.user_id} value={user.user_id}>
-                                        {user.nickname ? `${user.nickname} (${user.email})` : user.email}
-                                    </option>
-                                ))}
-                            </select>
-                            {errorMsg(errors.AssignedUserError)}
-                        </div>
+                            onChange={setAssignedUser}
+                            config={{ type: 'select', options: orgUsers.map(u => ({
+                                label: u.nickname ? `${u.nickname} (${u.email})` : u.email,
+                                value: u.user_id
+                            })) }}
+                            placeholder="Select a user…"
+                            error={errors.AssignedUserError}
+                        />
 
-                        <div className="flex flex-col">
-                            <label htmlFor="task-due-date-input" className="mb-2 font-medium text-sm">
-                            Due Date
-                            </label>
-                            <input
-                                type="date"
-                                id="task-due-date-input"
-                                name="task-due-date-input"
-                                value={dueDate}
-                                onChange={(e) => setDueDate(e.target.value)}
-                                className={`px-3 py-2 border rounded bg-surface ${errors.DueDateError ? 'border-red-500' : 'border-gray-300'}`}
-                            />
-                            {dueDate && (
-                            <p className="text-xs text-gray-400 mt-1">
-                            </p>
-                            )}
-                            {errorMsg(errors.DueDateError)}
-                        </div>
+                        <FormField 
+                            name="task-due-date-input"
+                            label="Due Date"
+                            value={dueDate}
+                            onChange={setDueDate}
+                            config={{type: 'date'}}
+                        />
                     </div>
 
                     <div className="flex flex-col md:flex-row gap-4">
-                        <div className="flex flex-col flex-1">
-                        <label htmlFor="task-priority-input" className="mb-2 font-medium text-sm">
-                            Priority
-                        </label>
-                        <select
-                            id="task-priority-input"
+                        <FormField
                             name="task-priority-input"
+                            label="Priority"
                             value={priority}
-                            onChange={(e) => setPriority(e.target.value)}
-                            className={`px-3 py-2 border rounded bg-surface ${errors.PriorityError ? 'border-red-500' : 'border-gray-300'}`}
-                        >
-                            <option value="" disabled>Select priority…</option>
-                            {PRIORITIES.map((p) => (
-                            <option key={p.value} value={p.value}>{p.label}</option>
-                            ))}
-                        </select>
-                        {errorMsg(errors.PriorityError)}
-                        </div>
-                
-                        <div className="flex flex-col flex-1">
-                        <label htmlFor="task-status-type-input" className="mb-2 font-medium text-sm">
-                            Status Type
-                        </label>
-                        <select
-                            id="task-status-type-input"
-                            name="task-status-type-input"
-                            value={statusType}
-                            onChange={(e) => setStatusType(e.target.value)}
-                            className={`px-3 py-2 border rounded bg-surface w-full ${errors.StatusTypeError ? 'border-red-500' : 'border-gray-300'}`}
-                        >
-                            <option value="" disabled>Select status…</option>
-                            {STATUS_OPTIONS.map((s) => (
-                                <option key={s.value} value={s.value}>{s.label}</option>
-                            ))}
-                        </select>
+                            onChange={setPriority}
+                            config={{ type: 'select', options: PRIORITIES.map(p => ({
+                                label: p.label,
+                                value: p.value
+                            })) }}
+                            placeholder="Select a user…"
+                            error={errors.AssignedUserError}
+                            specialStyling={true}
+                        />
 
-                        {/* {selectedStatus && (
-                            <div className="flex items-center gap-1.5 mt-1">
-                            <span className={`inline-block w-2 h-2 rounded-full ${selectedStatus.dot}`} />
-                            <span className={`text-xs font-medium ${selectedStatus.color}`}>
-                                {selectedStatus.label}
-                            </span>
-                            </div>
-                        )} */}
-                        {!selectedStatus && errorMsg(errors.StatusTypeError)}
-                        </div>
+                        <FormField 
+                            name='task-status-type-input'
+                            label='Status Type'
+                            value={statusType}
+                            onChange={setStatusType}
+                            config={{ type: 'select', options: STATUS_OPTIONS.map(status => ({
+                                label: status.label,
+                                value: status.value
+                            })) }}
+                            specialStyling={true}
+                        />
                     </div>
                         <button
                             type='submit' id='edit-task-form-submit'

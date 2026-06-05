@@ -21,9 +21,9 @@ export const SIDEBAR_SECTIONS: SidebarSectionInterface[] = [
         ],
     },
     {
-        title: 'Organisation',
+        title: 'Management',
         items: [
-            { label: 'Members', icon: <GoPeople className='h-6 w-6 m-2 transition-all duration-300 hover:scale-110 hover:cursor-pointer'/>},
+            { label: 'Members', icon: <GoPeople className='h-6 w-6 m-2 transition-all duration-300 hover:scale-110 hover:cursor-pointer'/>, href: '/:orgId/members'},
         ],
     },
     {

@@ -1,5 +1,9 @@
 import { TASKS, TASK_TYPE_CLASSES } from '@/constants/dummy-data';
 import type { Task } from '@/constants/dummy-data';
+
+import { DataTable } from '@/components/output/DataTable';
+import type { ColumnDef } from '@/components/output/DataTable';
+
 import { formatYearMonth } from '@/utils/dateUtils';
 import { useNavigate } from 'react-router-dom';
 export const Calendar = () => {
@@ -22,6 +26,39 @@ export const Calendar = () => {
     });
 
     const navigate = useNavigate();
+
+    const taskColumns: ColumnDef<Task>[] = [
+        {
+            key: 'task_id',
+            header: 'Task ID',
+            render: (task) => task.task_id,
+        },
+        {
+            key: 'status',
+            header: 'Status',
+            render: (task) => task.status,
+        },
+        {
+            key: 'priority',
+            header: 'Priority',
+            render: (task) => task.priority,
+        },
+        {
+            key: 'task_type',
+            header: 'Type',
+            render: (task) => (
+                <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${TASK_TYPE_CLASSES[task.task_type]}`}>
+                    {task.task_type}
+                </span>
+            ),
+        },
+        {
+            key: 'due_date',
+            header: 'Due Date',
+            render: (task) => new Date(task.due_date).toLocaleDateString(),
+        },
+    ];
+
     return (
         <div className='min-w-full min-h-full p-2 bg-darkened-surface flex md:flex-col flex-wrap'>
             <div className='md:w-full flex flex-col gap-6 overflow-x-scroll'>
@@ -30,36 +67,12 @@ export const Calendar = () => {
                 {sortedMonths.map(month => (
                     <div key={month}>
                         <h2 className='text-xl font-semibold mb-2'>{formatYearMonth(month)}</h2>
-                        <table className='min-w-full text-lg border'>
-                            <thead className='bg-primary border-b border-primary'>
-                                <tr>
-                                    <th scope='col' className='w-1/5 px-3 py-2 text-left font-medium'>Task ID</th>
-                                    <th scope='col' className='w-1/5 px-3 py-2 text-left font-medium'>Status</th>
-                                    <th scope='col' className='w-1/5 px-3 py-2 text-left font-medium'>Priority</th>
-                                    <th scope='col' className='w-1/5 px-3 py-2 text-left font-medium'>Type</th>
-                                    <th scope='col' className='w-1/5 px-3 py-2 text-left font-medium'>Due Date</th>
-                                </tr>
-                            </thead>
-                            <tbody className='divide-y divide-accent'>
-                                {grouped[month].map(task => (
-                                    <tr 
-                                        key={task.task_id} 
-                                        className='hover:bg-accent transition-colors last:border-b-0 hover:cursor-pointer'
-                                        onClick={() => {navigate(`/task/${task.project_id}/${task.task_id}`);console.log(task)}}
-                                    >
-                                        <td className='px-3.5 py-2.5'>{task.task_id}</td>
-                                        <td className='px-3.5 py-2.5'>{task.status}</td>
-                                        <td className='px-3.5 py-2.5'>{task.priority}</td>
-                                        <td className='px-3.5 py-2.5'>
-                                            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${TASK_TYPE_CLASSES[task.task_type]}`}>
-                                                {task.task_type}
-                                            </span>
-                                        </td>
-                                        <td className='px-3.5 py-2.5'>{new Date(task.due_date).toLocaleDateString()}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                        <DataTable
+                            data={grouped[month]}
+                            columns={taskColumns}
+                            getRowKey={(task) => task.task_id}
+                            onRowClick={(task) => navigate(`/task/${task.project_id}/${task.task_id}`)}
+                        />
                     </div>
                 ))}
             </div>
