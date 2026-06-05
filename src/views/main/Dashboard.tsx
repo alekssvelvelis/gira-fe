@@ -1,9 +1,9 @@
 import { useState } from 'react';
 
 import { TASKS, TASK_TYPE_CLASSES } from '@/constants/dummy-data';
-
+import { useNavigate } from 'react-router-dom';
 export const Dashboard = () => {
-
+    const navigate = useNavigate();
     const [userTasks, setUserTasks] = useState({});
     const tasks = Object.values(TASKS).filter(t => t.user_id === 'usr-006');
     return(
@@ -18,16 +18,16 @@ export const Dashboard = () => {
                     <table className="min-w-full text-lg border">
                         <thead className="bg-accent border-b border-primary">
                             <tr>
-                                <th scope="col" className="w-1/5 px-3.5 py-2.5 text-left font-medium">Task ID</th>
-                                <th scope="col" className="w-1/5 px-3.5 py-2.5 text-left font-medium">Status</th>
-                                <th scope="col" className="w-1/5 px-3.5 py-2.5 flex text-center font-medium">Priority</th>
-                                <th scope="col" className="w-1/5 px-3.5 py-2.5 text-left font-medium">Type</th>
-                                <th scope="col" className="w-1/5 px-3.5 py-2.5 text-left font-medium">Due Date</th>
+                                <th scope="col" className="w-1/5 px-3 py-2 text-left font-medium">Task ID</th>
+                                <th scope="col" className="w-1/5 px-3 py-2 text-left font-medium">Status</th>
+                                <th scope="col" className="w-1/5 px-3 py-2 flex text-center font-medium">Priority</th>
+                                <th scope="col" className="w-1/5 px-3 py-2 text-left font-medium">Type</th>
+                                <th scope="col" className="w-1/5 px-3 py-2 text-left font-medium">Due Date</th>
                             </tr>
                         </thead>
                         <tbody className='divide-y divide-accent'>
                             {tasks.map(task => (
-                                <tr key={task.task_id} className='hover:bg-accent transition-colors last:border-b-0 hover:cursor-pointer'>
+                                <tr key={task.task_id} className='hover:bg-accent transition-colors last:border-b-0 hover:cursor-pointer' onClick={() => navigate(`${task.project_id}/${task.task_id}`)}>
                                     <td>{task.task_id}</td>
                                     <td>{task.status}</td>
                                     <td>{task.priority}</td>

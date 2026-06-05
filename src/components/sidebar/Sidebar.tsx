@@ -8,12 +8,15 @@ import { SlLogout } from "react-icons/sl";
 
 import { SIDEBAR_SECTIONS } from '@/constants/sidebar-sections';
 
+import { useAuth } from '@/hooks/useAuth';
+
 export const Sidebar = () => {
 
     const [sidebarShown, setSidebarShown] = useState<boolean>(true);
+    const { logout } = useAuth();
 
     return (
-        <nav className={`min-h-screen bg-accent flex flex-col overflow-hidden transition-all duration-300 ${sidebarShown ? 'w-48' : 'w-10'}`}>
+        <nav className={`min-h-screen max-h-screen sticky bg-accent flex flex-col overflow-hidden transition-all duration-300 ${sidebarShown ? 'w-48' : 'w-10'}`}>
             {/* width in tailwind is calculated as w-{number * 0.25rem}, therefore w-48 = 12rem and w-10 = 2.5rem. REM is the default, so use rem for calculations */}
             <div className={`w-48 flex flex-col flex-1 transition-all duration-300 ${sidebarShown ? 'translate-x-0' : '-translate-x-[calc(12rem-2.5rem)]'}`}>
                 <div className='w-full max-h-16 bg-accent flex flex-row items-center'>
@@ -61,7 +64,10 @@ export const Sidebar = () => {
                     <IoCogOutline className='h-6 w-6 flex-shrink-0 transition-all duration-300 hover:scale-110 hover:cursor-pointer' />
                 </div>
                 <hr />
-                <div className='pb-1 w-full h-10 flex items-center justify-between px-2 duration-300 transition-all hover:cursor-pointer hover:bg-secondary'>
+                <div 
+                onClick={() => logout()}
+                className='pb-1 w-full h-10 flex items-center justify-between px-2 duration-300 transition-all hover:cursor-pointer hover:bg-secondary'
+                >
                     <h1 className='text-xl font-light'>Logout</h1>
                     <SlLogout className='h-6 w-6 flex-shrink-0 transition-all duration-300 hover:scale-110 hover:cursor-pointer' />
                 </div>

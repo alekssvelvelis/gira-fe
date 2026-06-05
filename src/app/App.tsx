@@ -6,6 +6,8 @@ import { RegisterView } from '@/views/authentication/RegisterView';
 import { Dashboard } from '@/views/main/Dashboard';
 import { Calendar } from '@/views/main/Calendar';
 
+import { TaskView } from '@/views/tasks/TaskView';
+
 import ProtectedRoute from '@/components/authentication/ProtectedRoute';
 import { SidebarLayout } from '@/components/layouts/SidebarLayout';
 
@@ -19,22 +21,15 @@ export default function App() {
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<LoginView />} />
           <Route path="/register" element={<RegisterView />} />
-
-          <Route path="/dashboard" element={
+          <Route element={
             <ProtectedRoute>
-              <SidebarLayout>
-                <Dashboard />
-              </SidebarLayout>
+              <SidebarLayout />
             </ProtectedRoute>
-          } />
-
-          <Route path="/calendar" element={
-            <ProtectedRoute>
-              <SidebarLayout>
-                <Calendar />
-              </SidebarLayout>
-            </ProtectedRoute>
-          } />
+          }>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/calendar" element={<Calendar />} />
+            <Route path="/task/:projectId/:taskId" element={<TaskView />} />
+          </Route>
         </Routes>
       </BrowserRouter>
     </AuthProvider>
