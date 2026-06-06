@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { GoArrowLeft } from 'react-icons/go';
-import { FiEdit2, FiUserPlus, FiUsers } from 'react-icons/fi';
+import { FiEdit2, FiUserPlus, FiUsers, FiPlusCircle } from 'react-icons/fi';
 import { ORGANIZATIONS, USERS, PROJECTS } from '@/constants/dummy-data';
 import type { Project } from '@/constants/dummy-data';
 import { DataTable } from '@/components/output/DataTable';
@@ -105,7 +105,16 @@ export const SingleOrganizationView = () => {
             </div>
 
             <div className='mb-8'>
-                <h2 className='text-2xl font-semibold mb-4'>Projects</h2>
+                <div className='flex justify-between'>
+                    <h2 className='text-2xl font-semibold mb-4'>Projects</h2>
+                    <button
+                        onClick={() => navigate(`/organization/${organization.org_id}/projects/create`)}
+                        className='flex items-center gap-2 bg-accent px-2 mb-4 py-2 rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:cursor-pointer'
+                    >
+                        <FiPlusCircle className='h-5 w-5' />
+                        Create Project
+                    </button>
+                </div>
                 <DataTable
                     data={projects}
                     columns={projectColumns}

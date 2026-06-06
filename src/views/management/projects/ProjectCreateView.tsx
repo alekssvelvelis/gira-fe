@@ -80,17 +80,15 @@ export const ProjectCreateView = () => {
                 </div>
 
                 <div>
-                    <label className='block text-sm font-medium mb-2'>Project description</label>
-                    <textarea
+                    <FormField
+                        name='project-description'
+                        label='Project description'
                         value={projectDescription}
-                        onChange={(e) => setProjectDescription(e.target.value)}
+                        onChange={setProjectDescription}
+                        config={{ type: 'textarea', rows: 5 }}
                         placeholder='Enter project description...'
-                        className='w-full px-3 py-2 border border-border rounded-lg bg-surface text-sidebar-text focus:outline-none focus:ring-2 focus:ring-accent'
-                        rows={6}
+                        error={errors.ProjectDescriptionError}
                     />
-                    {errors.ProjectDescriptionError && (
-                        <p className='text-red-500 text-sm mt-1'>{errors.ProjectDescriptionError}</p>
-                    )}
                 </div>
 
                 <button
