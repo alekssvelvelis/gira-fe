@@ -8,17 +8,21 @@ import { Calendar } from '@/views/main/Calendar';
 
 import { TaskView } from '@/views/tasks/TaskView';
 import { TaskEditView } from '@/views/tasks/TaskEditView';
+import { TaskCreateView } from '@/views/tasks/TaskCreateView';
+
 import { MemberView } from '@/views/management/MembersView';
+import { SingleMemberView } from '@/views/user/SingleMemberView';
+import { UserEditView } from '@/views/user/UserEditView';
+
 import { OrganizationsView } from '@/views/management/organization/OrganizationsView';
 import { SingleOrganizationView } from '@/views/management/organization/SingleOrganizationView';
 import { SingleOrganizationEditView } from '@/views/management/organization/OrganizationEditView';
 import { SingleOrganizationCreateView } from '@/views/management/organization/OrganizationCreateView';
+
 import { ProjectsView } from '@/views/management/projects/ProjectsView';
 import { ProjectCreateView } from '@/views/management/projects/ProjectCreateView';
 import { ProjectEditView } from '@/views/management/projects/ProjectEditView';
 import { SingleProjectView } from '@/views/management/projects/SingleProjectView';
-import { SingleMemberView } from '@/views/user/SingleMemberView';
-import { UserEditView } from '@/views/user/UserEditView';
 
 import ProtectedRoute from '@/components/authentication/ProtectedRoute';
 import { SidebarLayout } from '@/components/layouts/SidebarLayout';
@@ -56,7 +60,8 @@ export default function App() {
 
             <Route path="/organization/:orgId/project/:projId/tasks/:taskId" element={<TaskView />} />
             <Route path="/organization/:orgId/project/:projId/tasks/:taskId/edit" element={<TaskEditView />} />
-          </Route>
+            <Route path="/organization/:orgId/project/:projId/tasks/create" element={<TaskCreateView />} />
+           </Route>
         </Routes>
       </BrowserRouter>
     </AuthProvider>
