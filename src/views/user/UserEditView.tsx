@@ -116,7 +116,6 @@ export const UserEditView = () => {
     return (
         <div className='relative min-h-full max-h-full overflow-y-scroll bg-darkened-surface p-4 md:p-6'>
 
-            {/* ── Header ────────────────────────────────────────────────── */}
             <div className='flex items-center justify-between pb-3 border-b border-border mb-5'>
                 <div className='flex items-center gap-3'>
                     <button
@@ -155,13 +154,12 @@ export const UserEditView = () => {
                             className='w-full h-full object-cover'
                             alt='Profile picture'
                         />
-                        {/* Hover overlay */}
+
                         <div className='absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200'>
                             <span className='text-white text-xs text-center'>Change photo</span>
                         </div>
                     </div>
 
-                    {/* Validation error */}
                     {errors.ProfileImageError && (
                         <p className='text-red-500 text-sm mt-1'>{errors.ProfileImageError}</p>
                     )}

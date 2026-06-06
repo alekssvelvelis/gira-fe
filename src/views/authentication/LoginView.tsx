@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { login } from '@/services/authService';
+import { FormField } from '@/components/input/FormField';
 
 interface LoginErrors {
     loginEmailError: string,
@@ -76,36 +77,26 @@ export const LoginView = () => {
             <div id='login-card' className='w-[315px] bg-darkened-surface border rounded border-gray-300 flex flex-col justify-center p-8'>
                 <form id='login-form' className='flex flex-col w-full gap-4' onSubmit={(handleSubmit)}>
                     <div id='login-form-email' className='flex flex-col'>
-                        <label htmlFor='login-email-input' className='mb-2'>Email</label>
-                        <input 
-                            type='email' 
-                            id='login-email-input' 
-                            name='login-email-input' 
+                        <FormField
+                            name='user-edit-email'
+                            label='User email'
                             value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className={`px-3 py-2 border rounded ${errors.loginEmailError ? 'border-red-500' : 'border-gray-300'}`}
+                            onChange={setEmail}
+                            config={{ type: 'email' }}
+                            placeholder='Enter user email...'
+                            error={errors.loginEmailError}
                         />
-                        <p className={`text-sm mt-1 ${
-                            errors.loginEmailError ? 'text-red-500 visible' : 'invisible'
-                        }`}>
-                            {errors.loginEmailError || 'placeholder'}
-                        </p>
                     </div>
                     <div id='login-form-password' className='flex flex-col'>
-                        <label htmlFor='login-password-input' className='mb-2'>Password</label>
-                        <input 
-                            type='password' 
-                            id='login-password-input' 
-                            name='login-password-input' 
+                        <FormField
+                            name='login-password-input'
+                            label='Password'
                             value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className={`px-3 py-2 border rounded ${errors.loginPasswordError ? 'border-red-500' : 'border-gray-300'}`}
+                            onChange={setPassword}
+                            config={{ type: 'password' }}
+                            placeholder='Enter new password...'
+                            error={errors.loginPasswordError}
                         />
-                        <p className={`text-sm mt-1 ${
-                            errors.loginPasswordError ? 'text-red-500 visible' : 'invisible'
-                        }`}>
-                            {errors.loginPasswordError || 'placeholder'}
-                        </p>
                     </div>
                     <button type="submit" id='login-form-submit' name='login-form-submit' className='px-4 py-2 bg-primary text-white rounded transform-all duration-300 hover:opacity-90 hover:cursor-pointer'>Log in</button>
                     <a className='text-center hover:cursor-pointer transform-all duration-300 hover:scale-110' href={'/register'}>Don't have an account?</a>

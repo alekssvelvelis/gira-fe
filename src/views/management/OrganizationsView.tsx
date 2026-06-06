@@ -47,9 +47,9 @@ export const OrganizationsView = () => {
                                     {org.org_description}
                                 </p>
 
-                                <div className='pt-2 border-t border-accent'>
-                                    <p className='text-xs'>
-                                        Organization ID: <span className='font-mono'>{org.org_id}</span>
+                                <div className='pt-2 border-t'>
+                                    <p className='text-xs text-accent'>
+                                        Organization ID: <span className='font-mono text-sidebar-text'>{org.org_id}</span>
                                     </p>
                                 </div>
                             </div>

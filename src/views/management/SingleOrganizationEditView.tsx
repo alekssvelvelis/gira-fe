@@ -168,6 +168,7 @@ export const SingleOrganizationEditView = () => {
                         placeholder='e.g., NXPAY'
                         error={errors.OrgIdentifierError}
                     />
+
                     <div className='lg:col-span-2'>
                         <FormField
                             name='org-edit-description'

@@ -22,7 +22,7 @@ export const SingleOrganizationView = () => {
     const isOwner = currentUser.user_id === organization.owner_id;
 
     return (
-        <div className='relative min-h-full max-h-full overflow-y-scroll bg-darkened-surface p-4 md:p-6'>
+        <div className='relative min-h-full flex flex-col max-h-full overflow-y-scroll bg-darkened-surface p-4 md:p-6'>
 
             <div className='flex items-center justify-between pb-3 border-b border-border mb-8'>
                 <div className='flex items-center gap-3'>
@@ -38,8 +38,7 @@ export const SingleOrganizationView = () => {
                         <p className='text-xl font-medium'>{organization.org_name}</p>
                     </div>
                 </div>
-                
-                {/* Organization Identifier on Right */}
+
                 <div className='flex items-center gap-2'>
                     <span className='text-sm bg-primary text-secondary px-4 py-2 rounded-lg font-medium'>
                         {organization.org_identifier}
@@ -47,7 +46,7 @@ export const SingleOrganizationView = () => {
                 </div>
             </div>
 
-            <div className='flex flex-col md:flex-row gap-8 mb-8'>
+            <div className='flex flex-1 flex-col md:flex-row gap-8 mb-8'>
                 
                 <div className='flex-shrink-0'>
                     <img
@@ -83,7 +82,7 @@ export const SingleOrganizationView = () => {
             </div>
 
             {isOwner && (
-                <div className='flex absolute bottom-0 right-0  gap-3 pb-4 justify-end'>
+                <div className='flex w-full flex-wrap  gap-3 pb-4 justify-end'>
                     <button
                         onClick={() => navigate(`/organization/${organization.org_id}/invite`)}
                         className='flex items-center gap-2 bg-accent px-4 py-2 rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:cursor-pointer'
