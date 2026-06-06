@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { TASKS, USERS, PROJECTS, STATUS_OPTIONS, PRIORITIES} from "@/constants/dummy-data";
 import { GoArrowLeft } from "react-icons/go";
 import { FormField } from '@/components/input/FormField';
+
 interface TaskEditErrors {
     DescriptionError: string,
     AssignedUserError: string,
@@ -40,7 +41,7 @@ export const TaskEditView = () => {
             DueDateError: '',
             PriorityError: '',
             StatusTypeError: '',
-        });
+    });
 
     const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();

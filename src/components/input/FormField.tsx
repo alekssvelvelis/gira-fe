@@ -5,7 +5,8 @@ type FieldOption = { label: string; value: string };
 type FieldConfig =
     | { type: 'text' | 'email' | 'password' | 'number' | 'date'; }
     | { type: 'select'; options: FieldOption[]; }
-    | { type: 'textarea'; rows?: number; };
+    | { type: 'textarea'; rows?: number; }
+    | { type: 'image'; };
 
 
 export interface FormFieldProps {

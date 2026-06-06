@@ -58,19 +58,6 @@ export const RegisterView = () => {
         setErrors(newErrors);
 
         if (newErrors.registerEmailError || newErrors.registerPasswordError || newErrors.registerConfirmPasswordError) return;
-        // try {
-        //     const response = await register(email, password);
-        //     if (response.data.token) {
-        //         saveUser(response.data.token);
-        //         navigate('/dashboard');
-        //     }
-        // } catch (error: any) {
-        //     const errorData = error.response?.data;
-        //     setErrors({
-        //         registerEmailError: errorData?.email || '',
-        //         registerPasswordError: errorData?.password || ''
-        //     });
-        // }
     }
 
     return (
