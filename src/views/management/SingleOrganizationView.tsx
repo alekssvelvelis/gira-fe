@@ -1,7 +1,10 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { GoArrowLeft } from 'react-icons/go';
-import { FiEdit2, FiUserPlus } from 'react-icons/fi';
-import { ORGANIZATIONS, USERS } from '@/constants/dummy-data';
+import { FiEdit2, FiUserPlus, FiUsers } from 'react-icons/fi';
+import { ORGANIZATIONS, USERS, PROJECTS } from '@/constants/dummy-data';
+import type { Project } from '@/constants/dummy-data';
+import { DataTable } from '@/components/output/DataTable';
+import type { ColumnDef } from '@/components/output/DataTable';
 
 export const SingleOrganizationView = () => {
     const navigate = useNavigate();
@@ -20,6 +23,26 @@ export const SingleOrganizationView = () => {
     }
 
     const isOwner = currentUser.user_id === organization.owner_id;
+    
+    const projects = Object.values(PROJECTS).filter(p => p.org_id === orgId);
+    
+    const projectColumns: ColumnDef<Project>[] = [
+        {
+            key: 'project_id',
+            header: 'Project ID',
+            render: (project) => project.project_id,
+        },
+        {
+            key: 'name',
+            header: 'Name',
+            render: (project) => project.name,
+        },
+        {
+            key: 'description',
+            header: 'Description',
+            render: (project) => project.description,
+        },
+    ];
 
     return (
         <div className='relative min-h-full flex flex-col max-h-full overflow-y-scroll bg-darkened-surface p-4 md:p-6'>
@@ -81,6 +104,16 @@ export const SingleOrganizationView = () => {
                 </div>
             </div>
 
+            <div className='mb-8'>
+                <h2 className='text-2xl font-semibold mb-4'>Projects</h2>
+                <DataTable
+                    data={projects}
+                    columns={projectColumns}
+                    getRowKey={(project) => project.project_id}
+                    onRowClick={(project) => navigate(`/organization/${orgId}/project/${project.project_id}`)}
+                />
+            </div>
+
             {isOwner && (
                 <div className='flex w-full flex-wrap  gap-3 pb-4 justify-end'>
                     <button
@@ -89,6 +122,13 @@ export const SingleOrganizationView = () => {
                     >
                         <FiUserPlus className='h-5 w-5' />
                         Invite Members
+                    </button>
+                    <button
+                        onClick={() => navigate(`/organization/${organization.org_id}/members`)}
+                        className='flex items-center gap-2 bg-accent px-4 py-2 rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:cursor-pointer'
+                    >
+                        <FiUsers className='h-5 w-5' />
+                        View Members
                     </button>
                     <button
                         onClick={() => navigate(`/organization/${organization.org_id}/edit`)}

@@ -23,9 +23,7 @@ export const SIDEBAR_SECTIONS: SidebarSectionInterface[] = [
     {
         title: 'Management',
         items: [
-            { label: 'Members', icon: <GoPeople className='h-6 w-6 m-2 transition-all duration-300 hover:scale-110 hover:cursor-pointer'/>, href: '/:orgId/members'},
             { label: 'Organizations', icon: <LuClipboardList className='h-6 w-6 m-2 transition-all duration-300 hover:scale-110 hover:cursor-pointer'/>, href: '/organizations'},
-            { label: 'Projects', icon: <LuFolder className='h-6 w-6 m-2 transition-all duration-300 hover:scale-110 hover:cursor-pointer' />, href: '/projects'},
         ],
     },
     {

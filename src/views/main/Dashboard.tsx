@@ -46,7 +46,10 @@ export const Dashboard = () => {
     return (
         <div className='min-w-full min-h-full p-2 bg-darkened-surface flex md:flex-col flex-wrap'>
             <div className='md:w-full flex flex-col gap-6 overflow-x-scroll'>
-                <h1 className='text-3xl font-light'>Your calendar</h1>
+                <div className='flex flex-wrap justify-between'>
+                    <h1 className='text-xl md:text-3xl font-light'>Your Dashboard</h1>
+                    <h1 className='text-xl md:text-3xl font-light'>Welcome back, user!</h1>
+                </div>
                     <DataTable
                         data={tasks}
                         columns={taskColumns}

@@ -6,7 +6,7 @@ import { formatDateDayMonthYear } from '@/utils/dateUtils';
 
 export const TaskView = () => {
     const navigate = useNavigate();
-    const { projectId, taskId } = useParams<{ projectId: string; taskId: string }>();
+    const { orgId, projectId, taskId } = useParams<{ orgId: string; projectId: string; taskId: string }>();
     const task = Object.values(TASKS).find(t => t.task_id === taskId);
 
     if (!task) return (
@@ -69,7 +69,7 @@ export const TaskView = () => {
         </div>
 
             <button
-                onClick={() => navigate(`/task/${task.project_id}/${task.task_id}/edit`)}
+                onClick={() => navigate(`/organization/${orgId}/project/${projectId}/tasks/${task.task_id}/edit`)}
                 className='absolute bottom-5 right-5 flex items-center gap-1.5 bg-accent p-2 rounded-lg items-center duration-300 transition-all hover:cursor-pointer hover:bg-primary'
             >
                 <FiEdit2 className='h-6 w-6' />

@@ -12,6 +12,11 @@ import { MemberView } from '@/views/management/MembersView';
 import { OrganizationsView } from '@/views/management/OrganizationsView';
 import { SingleOrganizationView } from '@/views/management/SingleOrganizationView';
 import { SingleOrganizationEditView } from '@/views/management/SingleOrganizationEditView';
+import { SingleOrganizationCreateView } from '@/views/management/SingleOrganizationCreateView';
+import { ProjectsView } from '@/views/management/ProjectsView';
+import { ProjectCreateView } from '@/views/management/ProjectCreateView';
+import { ProjectEditView } from '@/views/management/ProjectEditView';
+import { SingleProjectView } from '@/views/management/SingleProjectView';
 import { SingleMemberView } from '@/views/user/SingleMemberView';
 import { UserEditView } from '@/views/user/UserEditView';
 
@@ -35,18 +40,22 @@ export default function App() {
           }>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/calendar" element={<Calendar />} />
-            <Route path="/task/:projectId/:taskId" element={<TaskView />} />
-            <Route path="/task/:projectId/:taskId/edit" element={<TaskEditView />} />
-            <Route path="/:orgId/members" element={<MemberView />} />
             <Route path="/member/:userId" element={<SingleMemberView />} />
             <Route path="/member/:userId/edit" element={<UserEditView />} />
-            {/* <Route path="/organizations/:ordId/projects" element={<ProjectsView />} /> */}
-            {/* <Route path="/organizations/:ordId/projects/create" element={<ProjectCreateView />} /> */}
-            {/* <Route path="/organizations/:ordId/projects/:projId/edit" element={<ProjectEditView />} /> */}
+
             <Route path="/organizations" element={<OrganizationsView />} />
             <Route path="/organization/:orgId" element={<SingleOrganizationView />} />
+            <Route path="/organization/:orgId/members" element={<MemberView />} />
             <Route path="/organization/:orgId/edit" element={<SingleOrganizationEditView />} />
-            {/* <Route path="/organizations/create" element={<SingleOrganizationCreateView />} /> */}
+            <Route path="/organization/create" element={<SingleOrganizationCreateView />} />
+
+            <Route path="/organization/:orgId/projects" element={<ProjectsView />} />
+            <Route path="/organization/:orgId/projects/create" element={<ProjectCreateView />} />
+            <Route path="/organization/:orgId/project/:projId" element={<SingleProjectView />} />
+            <Route path="/organization/:orgId/project/:projId/edit" element={<ProjectEditView />} />
+
+            <Route path="/organization/:orgId/project/:projId/tasks/:taskId" element={<TaskView />} />
+            <Route path="/organization/:orgId/project/:projId/tasks/:taskId/edit" element={<TaskEditView />} />
           </Route>
         </Routes>
       </BrowserRouter>
