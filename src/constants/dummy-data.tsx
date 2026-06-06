@@ -25,6 +25,7 @@ export interface Organization {
   org_description: string;
   org_name:       string;
   org_identifier: string;                  // unique 5-letter code
+  picture:        string;                  // organization logo/picture URL
 }
 
 export interface User {
@@ -74,6 +75,7 @@ export const ORGANIZATIONS: Record<string, Organization> = {
     org_description: "A fintech startup building next-generation payment infrastructure.",
     org_name:        "Nexus Pay",
     org_identifier:  "NXPAY",
+    picture:         "https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=400&h=300&fit=crop",
   },
   "org-002": {
     org_id:          "org-002",
@@ -81,6 +83,7 @@ export const ORGANIZATIONS: Record<string, Organization> = {
     org_description: "An open-source tooling company focused on developer experience.",
     org_name:        "DevForge Labs",
     org_identifier:  "DVFGL",
+    picture:         "https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=300&fit=crop",
   },
   "org-003": {
     org_id:          "org-003",
@@ -88,6 +91,7 @@ export const ORGANIZATIONS: Record<string, Organization> = {
     org_description: "A healthcare SaaS platform connecting clinics and patients.",
     org_name:        "MedBridge",
     org_identifier:  "MDBDG",
+    picture:         "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400&h=300&fit=crop",
   },
 };
 

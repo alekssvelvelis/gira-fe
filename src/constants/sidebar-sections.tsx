@@ -24,13 +24,15 @@ export const SIDEBAR_SECTIONS: SidebarSectionInterface[] = [
         title: 'Management',
         items: [
             { label: 'Members', icon: <GoPeople className='h-6 w-6 m-2 transition-all duration-300 hover:scale-110 hover:cursor-pointer'/>, href: '/:orgId/members'},
+            { label: 'Organizations', icon: <LuClipboardList className='h-6 w-6 m-2 transition-all duration-300 hover:scale-110 hover:cursor-pointer'/>, href: '/organizations/:userId'},
+            { label: 'Projects', icon: <LuFolder className='h-6 w-6 m-2 transition-all duration-300 hover:scale-110 hover:cursor-pointer' />, href: '/projects'},
         ],
     },
     {
-        title: 'Projects',
+        title: 'Self',
         items: [
-            { label: 'Projects', icon: <LuFolder className='h-6 w-6 m-2 transition-all duration-300 hover:scale-110 hover:cursor-pointer'/>},
-            { label: 'Tasks', icon: <LuClipboardList className='h-6 w-6 m-2 transition-all duration-300 hover:scale-110 hover:cursor-pointer' />},
+            { label: 'Organizations', icon: <LuClipboardList className='h-6 w-6 m-2 transition-all duration-300 hover:scale-110 hover:cursor-pointer'/>, href: '/create/organization'},
+            // { label: 'Tasks', icon: <LuClipboardList className='h-6 w-6 m-2 transition-all duration-300 hover:scale-110 hover:cursor-pointer' />},
         ],
     },
 ];

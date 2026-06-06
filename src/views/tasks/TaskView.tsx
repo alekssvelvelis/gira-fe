@@ -11,7 +11,7 @@ export const TaskView = () => {
 
     if (!task) return (
         <div className='min-h-full flex items-center justify-center'>
-        <h1 className='text-3xl'>Task not found.</h1>
+            <h1 className='text-3xl'>Task not found.</h1>
         </div>
     );
 
