@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { GoArrowLeft } from 'react-icons/go';
 import { FiEdit2 } from 'react-icons/fi';
+import { FiPlusCircle } from 'react-icons/fi';
 import { PROJECTS, TASKS, TASK_TYPE_CLASSES } from '@/constants/dummy-data';
 import { DataTable } from '@/components/output/DataTable';
 
@@ -121,7 +122,15 @@ export const SingleProjectView = () => {
                     <FiEdit2 className='h-5 w-5' />
                     Edit Project
                 </button>
+                <button
+                    onClick={() => navigate(`/organization/${orgId}/project/${project.project_id}/tasks/create`)}
+                    className='flex items-center gap-2 bg-accent px-4 py-2 rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:cursor-pointer'
+                >
+                    <FiPlusCircle className='h-5 w-5' />
+                    New Task
+                </button>
             </div>
+            
         </div>
     );
 }

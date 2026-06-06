@@ -2,6 +2,7 @@ import { TASKS, TASK_TYPE_CLASSES } from '@/constants/dummy-data';
 import { useNavigate, useParams } from 'react-router-dom';
 import { GoArrowLeft } from 'react-icons/go';
 import { FiEdit2 } from 'react-icons/fi';
+
 import { formatDateDayMonthYear } from '@/utils/dateUtils';
 
 export const TaskView = () => {
