@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { login } from '@/services/authService';
 import { FormField } from '@/components/input/FormField';
 
 interface LoginErrors {

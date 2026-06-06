@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { register } from '@/services/authService';
 import { FormField } from '@/components/input/FormField';
 
 interface registerErrors {
     registerEmailError: string,
+    registerNicknameError: string,
     registerPasswordError: string,
     registerConfirmPasswordError: string,
 };
@@ -13,16 +13,17 @@ interface registerErrors {
 export const RegisterView = () => {
 
     const [email, setEmail] = useState<string>('');
+    const [nickname, setNickname] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [confirmPassword, setConfirmPassword] = useState<string>('');
 
     const [errors, setErrors] = useState<registerErrors>({
         registerEmailError: '',
+        registerNicknameError: '',
         registerPasswordError: '',
         registerConfirmPasswordError: ''
     });
-
-    const { saveUser } = useAuth();
+    const { register } = useAuth();
     const navigate = useNavigate();
 
     const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
@@ -30,6 +31,7 @@ export const RegisterView = () => {
 
         const newErrors: registerErrors = {
             registerEmailError: '',
+            registerNicknameError: '',
             registerPasswordError: '',
             registerConfirmPasswordError: '',
         };
@@ -39,6 +41,12 @@ export const RegisterView = () => {
             newErrors.registerEmailError = 'Email is required';
         } else if (!emailPattern.test(email)) {
             newErrors.registerEmailError = 'Please enter a valid email';
+        }
+
+        if (!nickname) {
+            newErrors.registerNicknameError = 'Nickname is required';
+        } else if (nickname.length < 5 || nickname.length > 16) {
+            newErrors.registerNicknameError = 'Nickname length must be in interval [5...16]';
         }
 
         if (!password) {
@@ -59,6 +67,22 @@ export const RegisterView = () => {
         setErrors(newErrors);
 
         if (newErrors.registerEmailError || newErrors.registerPasswordError || newErrors.registerConfirmPasswordError) return;
+
+        try {
+            await register(email, nickname, password, confirmPassword);
+            navigate('/dashboard');
+        } catch (error: any) {
+            if (error.response?.status === 422) {
+                const laravelErrors = error.response.data.errors;
+                console.log(laravelErrors);
+                setErrors({
+                    registerEmailError: laravelErrors.email?.[0] ?? '',
+                    registerNicknameError: laravelErrors.nickname?.[0] ?? '',
+                    registerPasswordError: laravelErrors.password?.[0] ?? '',
+                    registerConfirmPasswordError: laravelErrors.password_confirmation?.[0] ?? '',
+                });
+            }
+        };
     }
 
     return (
@@ -75,6 +99,17 @@ export const RegisterView = () => {
                             config={{ type: 'email' }}
                             placeholder='Enter user email...'
                             error={errors.registerEmailError}
+                        />
+                    </div>
+                    <div id='register-form-nickname' className='flex flex-col'>
+                        <FormField
+                            name='register-nickname-input'
+                            label='Nickname'
+                            value={nickname}
+                            onChange={setNickname}
+                            config={{ type: 'text' }}
+                            placeholder='Enter user nickname...'
+                            error={errors.registerNicknameError}
                         />
                     </div>
                     <div id='register-form-password' className='flex flex-col'>

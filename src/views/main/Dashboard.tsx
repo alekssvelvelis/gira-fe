@@ -6,11 +6,15 @@ import type { ColumnDef } from '@/components/output/DataTable';
 
 import { TASKS, TASK_TYPE_CLASSES } from '@/constants/dummy-data';
 import { useNavigate } from 'react-router-dom';
+
+import { useAuth } from '@/hooks/useAuth';
+
 export const Dashboard = () => {
     const navigate = useNavigate();
     const [userTasks, setUserTasks] = useState({});
     const tasks = Object.values(TASKS).filter(t => t.user_id === 'usr-006');
 
+    const { user } = useAuth();
         const taskColumns: ColumnDef<Task>[] = [
             {
                 key: 'task_id',
@@ -48,7 +52,7 @@ export const Dashboard = () => {
             <div className='md:w-full flex flex-col gap-6 overflow-x-scroll'>
                 <div className='flex flex-wrap justify-between'>
                     <h1 className='text-xl md:text-3xl font-light'>Your Dashboard</h1>
-                    <h1 className='text-xl md:text-3xl font-light'>Welcome back, user!</h1>
+                    <h1 className='text-xl md:text-3xl font-light'>{user ? `Welcome, ${user.nickname}` : 'Welcome!'}</h1>
                 </div>
                     <DataTable
                         data={tasks}

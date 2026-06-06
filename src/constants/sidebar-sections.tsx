@@ -26,11 +26,11 @@ export const SIDEBAR_SECTIONS: SidebarSectionInterface[] = [
             { label: 'Organizations', icon: <LuClipboardList className='h-6 w-6 m-2 transition-all duration-300 hover:scale-110 hover:cursor-pointer'/>, href: '/organizations'},
         ],
     },
-    {
-        title: 'Self',
-        items: [
-            { label: 'Organizations', icon: <LuClipboardList className='h-6 w-6 m-2 transition-all duration-300 hover:scale-110 hover:cursor-pointer'/>, href: '/create/organization'},
-            // { label: 'Tasks', icon: <LuClipboardList className='h-6 w-6 m-2 transition-all duration-300 hover:scale-110 hover:cursor-pointer' />},
-        ],
-    },
+    // {
+    //     title: 'Self',
+    //     items: [
+    //         { label: 'Organizations', icon: <LuClipboardList className='h-6 w-6 m-2 transition-all duration-300 hover:scale-110 hover:cursor-pointer'/>, href: '/create/organization'},
+    //         // { label: 'Tasks', icon: <LuClipboardList className='h-6 w-6 m-2 transition-all duration-300 hover:scale-110 hover:cursor-pointer' />},
+    //     ],
+    // },
 ];
