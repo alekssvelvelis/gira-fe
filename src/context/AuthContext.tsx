@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 
 import { createContext, useState } from 'react';
 
-import { logoutRequest, registerRequest } from '@/services/authService';
+import { loginRequest, logoutRequest, registerRequest } from '@/services/authService';
 
 interface User {
     token: string,
@@ -15,6 +15,7 @@ interface AuthContextValue {
     user: User | null,
     saveUser: (token: string, userData: Omit<User, 'token'>) => void,
     register: (email: string, nickname: string, password: string, confirmPassword: string) => Promise<void>,
+    login: (email: string, password: string) => Promise<void>,
     logout: () => Promise<void>,
     isAuthenticated: boolean
 };
@@ -46,6 +47,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
     };
 
+    const login = async (email: string, password: string) => {
+        const { token, user } = await loginRequest(email, password);
+        saveUser(token, {
+            id: user.id,
+            email: user.email,
+            nickname: user.nickname,
+        });
+    }
+
     const logout = async () => {
         try {
             await logoutRequest();
@@ -61,7 +71,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const isAuthenticated = !!user;
 
     return (
-        <AuthContext.Provider value={{ user, saveUser, register, logout, isAuthenticated }}>
+        <AuthContext.Provider value={{ user, saveUser, register, login, logout, isAuthenticated }}>
             {children}
         </AuthContext.Provider>
     );

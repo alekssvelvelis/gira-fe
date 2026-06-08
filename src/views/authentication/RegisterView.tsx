@@ -87,7 +87,7 @@ export const RegisterView = () => {
 
     return (
         <div className='min-w-screen min-h-screen flex flex-col items-center justify-center'>
-            <h1 className='text-3xl font-bold mb-6 text-center'>Sign in to your account</h1>
+            <h1 className='text-3xl font-bold mb-6 text-center'>Register your account</h1>
             <div id='register-card' className='w-[315px] bg-darkened-surface border rounded border-gray-300 flex flex-col justify-center p-8'>
                 <form id='register-form' className='flex flex-col w-full gap-4' onSubmit={(handleSubmit)}>
                     <div id='register-form-email' className='flex flex-col'>

@@ -33,3 +33,14 @@ export const registerRequest = async (email: string, nickname: string, password:
 export const logoutRequest = async () => {
     await api.post('/logout');
 };
+
+export const loginRequest = async (email: string, password: string) => {
+  const response = await api.post('/login', {
+    email,
+    password
+  });
+
+  const { token, user, message } = response.data;
+  console.log(message);
+  return { token, user };
+}

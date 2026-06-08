@@ -17,14 +17,8 @@ export const LoginView = () => {
         loginPasswordError: ''
     });
 
-    const { saveUser } = useAuth();
+    const { login } = useAuth();
     const navigate = useNavigate();
-
-    const handleTestLogin = () => {
-        const testToken = `test-token-${Date.now()}`;
-        saveUser(testToken);
-        navigate('/calendar');
-    };
 
     const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -50,27 +44,26 @@ export const LoginView = () => {
         setErrors(newErrors);
 
         if (newErrors.loginEmailError || newErrors.loginPasswordError) return;
-        // try {
-        //     const response = await login(email, password);
-        //     if (response.data.token) {
-        //         saveUser(response.data.token);
-        //         navigate('/dashboard');
-        //     }
-        // } catch (error: any) {
-        //     const errorData = error.response?.data;
-        //     setErrors({
-        //         loginEmailError: errorData?.email || '',
-        //         loginPasswordError: errorData?.password || ''
-        //     });
-        // }
+        try {  
+            console.log(1);
+            await login(email, password);
+            navigate('/dashboard');
+        } catch (error: any) {
+            console.log(2);
+            if (error.response?.status >= 400) {
+                const laravelErrors = error.response.data;
+                console.log(laravelErrors);
+                setErrors({
+                    loginEmailError: laravelErrors.message ?? '',
+                    loginPasswordError: laravelErrors.message ?? '',
+                });
+            }
+            
+        }
     }
 
     return (
         <div className='min-w-screen min-h-screen flex flex-col items-center justify-center'>
-
-            <button onClick={handleTestLogin} className='text-sm text-gray-400 mt-2'>
-                Test Login (no backend)
-            </button>
 
             <h1 className='text-3xl font-bold mb-6 text-center'>Sign in to your account</h1>
             <div id='login-card' className='w-[315px] bg-darkened-surface border rounded border-gray-300 flex flex-col justify-center p-8'>
