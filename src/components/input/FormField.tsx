@@ -25,6 +25,7 @@ export function FormField({ name, label, value, onChange, config, placeholder, e
     const baseClass = `w-full px-3 py-2 border rounded-md bg-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary`;
     const errorClass = error ? 'border-red-500' : 'border-accent';
 
+    
     const renderInput = () => {
         switch (config.type) {
             case 'text':

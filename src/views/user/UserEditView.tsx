@@ -35,9 +35,7 @@ export const UserEditView = () => {
         if (!file) return;
 
         const reader = new FileReader();
-        reader.onloadend = () => {
-            setUserProfilePicture(reader.result as string);
-        };
+        reader.onloadend = () => setUserProfilePicture(reader.result as string);
         reader.readAsDataURL(file);
     };
 

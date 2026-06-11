@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { useNavigate } from "react-router-dom";
 import { GoArrowLeft } from "react-icons/go";
 import { FormField } from '@/components/input/FormField';
+import { organizationCreateRequest } from '@/services/organizationService';
 
 interface OrganizationCreateErrors {
     OrgNameError: string;
@@ -10,7 +11,7 @@ interface OrganizationCreateErrors {
     OrgPictureError: string;
 }
 
-const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png'];
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
 export const SingleOrganizationCreateView = () => {
     const navigate = useNavigate();
@@ -27,9 +28,7 @@ export const SingleOrganizationCreateView = () => {
         if (!file) return;
 
         const reader = new FileReader();
-        reader.onloadend = () => {
-            setOrgPicture(reader.result as string);
-        };
+        reader.onloadend = () => setOrgPicture(reader.result as string);
         reader.readAsDataURL(file);
     };
 
@@ -39,14 +38,14 @@ export const SingleOrganizationCreateView = () => {
         OrgDescriptionError: '',
         OrgPictureError: '',
     });
-
+    
     const validateImageType = (value: string | null): string => {
-        if (!value) return ''; // image is optional
+        if (!value) return 'Provide a logo for your organization';
         const mimeMatch = value.match(/^data:([\w/]+);base64,/);
         if (!mimeMatch) return 'Invalid image format.';
         const mime = mimeMatch[1];
         if (!ALLOWED_IMAGE_TYPES.includes(mime)) {
-            return 'Only JPG, JPEG, or PNG images are allowed.';
+            return 'Only JPG, JPEG, PNG or WEBP images are allowed.';
         }
         return '';
     };
@@ -82,8 +81,21 @@ export const SingleOrganizationCreateView = () => {
         setErrors(newErrors);
 
         if (Object.values(newErrors).some(e => e !== '')) return;
-
-        console.log('Organization created successfully');
+        try {
+            await organizationCreateRequest(orgName, orgIdentifier, orgDescription,  orgPicture ? orgPicture : '');
+            navigate(-1);
+        } catch (error: any) {
+            if (error.response?.status === 422) {
+                const laravelErrors = error.response.data.errors;
+                console.log(laravelErrors);
+                setErrors({
+                    OrgNameError: laravelErrors.organization_name?.[0] ?? '',
+                    OrgIdentifierError: laravelErrors.organization_identifier?.[0] ?? '',
+                    OrgDescriptionError: laravelErrors.organization_description?.[0] ?? '',
+                    OrgPictureError: laravelErrors.organization_picture?.[0] ?? '',
+                });
+            }
+        }
     };
 
     return (

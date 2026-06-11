@@ -1,30 +1,60 @@
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { GoArrowLeft } from 'react-icons/go';
 import { FiEdit2, FiUserPlus, FiUsers, FiPlusCircle } from 'react-icons/fi';
-import { ORGANIZATIONS, USERS, PROJECTS } from '@/constants/dummy-data';
-import type { Project } from '@/constants/dummy-data';
-import { DataTable } from '@/components/output/DataTable';
+
+import { getSpecificOrganizationRequest } from '@/services/organizationService';
+
+import type { Organization } from '@/constants/dummy-data';
 import type { ColumnDef } from '@/components/output/DataTable';
+
+import { DataTable } from '@/components/output/DataTable';
+import { BACKEND_URL } from '@/utils/axios';
+
+import { useAuth } from '@/hooks/useAuth';
 
 export const SingleOrganizationView = () => {
     const navigate = useNavigate();
     const { orgId } = useParams<{ orgId: string }>();
+    const { user } = useAuth();
     
-    const organization = Object.values(ORGANIZATIONS).find(org => org.org_id === orgId);
-    const currentUser = USERS['usr-001'];
-    const owner = USERS[organization?.owner_id || ''];
+    const [organizationData, setOrganizationData] = useState<Organization>();
+    const [isLoading, setIsLoading] = useState(true);
     
-    if (!organization) {
+
+    useEffect(() => {
+        const fetchSingleOrganization = async (organizationId: number) => {
+            try {
+                setIsLoading(true);
+                const data = await getSpecificOrganizationRequest(organizationId);
+                setOrganizationData(data);
+            } catch (error) {
+                console.error("Failed to fetch organization:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+
+        if (orgId) {
+            fetchSingleOrganization(Number(orgId));
+        }
+    }, [orgId]);
+
+    if (isLoading) {
+        return (
+            <div className='min-h-full flex items-center justify-center bg-darkened-surface'>
+                <h1 className='text-3xl text-white'>Loading...</h1>
+            </div>
+        );
+    }
+    
+    if (!organizationData) {
         return (
             <div className='min-h-full flex items-center justify-center bg-darkened-surface'>
                 <h1 className='text-3xl'>Organization not found.</h1>
             </div>
         );
     }
-
-    const isOwner = currentUser.user_id === organization.owner_id;
-    
-    const projects = Object.values(PROJECTS).filter(p => p.org_id === orgId);
     
     const projectColumns: ColumnDef<Project>[] = [
         {
@@ -58,13 +88,13 @@ export const SingleOrganizationView = () => {
                     </button>
                     <div>
                         <p className='text-lg mb-0.5'>Currently viewing:</p>
-                        <p className='text-xl font-medium'>{organization.org_name}</p>
+                        <p className='text-xl font-medium'>{organizationData.organization_name}</p>
                     </div>
                 </div>
 
                 <div className='flex items-center gap-2'>
                     <span className='text-sm bg-primary text-secondary px-4 py-2 rounded-lg font-medium'>
-                        {organization.org_identifier}
+                        {organizationData.organization_identifier}
                     </span>
                 </div>
             </div>
@@ -73,8 +103,8 @@ export const SingleOrganizationView = () => {
                 
                 <div className='flex-shrink-0'>
                     <img
-                        src={organization.picture}
-                        alt={organization.org_name}
+                        src={`${BACKEND_URL}/storage/${organizationData.organization_picture}`}
+                        alt={organizationData.organization_name}
                         className='w-80 h-64 object-cover rounded-lg border border-accent'
                     />
                 </div>
@@ -82,23 +112,23 @@ export const SingleOrganizationView = () => {
                 <div className='flex flex-col gap-6 flex-1'>
                     <div>
                         <p className='text-sm text-accent mb-2'>Created by</p>
-                        <p className='text-2xl font-semibold'>{owner?.nickname || owner?.email}</p>
-                        <p className='text-xs text-accent mt-1 font-mono'>{owner?.user_id}</p>
+                        <p className='text-2xl font-semibold'>{organizationData.owner?.name || organizationData.owner?.email}</p>
+                        <p className='text-xs text-accent mt-1 font-mono'>{organizationData.owner?.id}</p>
                     </div>
 
                     <div>
                         <p className='text-sm text-accent mb-2'>Description</p>
-                        <p className='text-lg leading-relaxed'>{organization.org_description}</p>
+                        <p className='text-lg leading-relaxed'>{organizationData.organization_description}</p>
                     </div>
 
                     <div className='grid grid-cols-2 gap-4 pt-4 border-t'>
                         <div>
                             <p className='text-xs text-accent mb-1'>Organization ID</p>
-                            <p className='font-mono text-sm'>{organization.org_id}</p>
+                            <p className='font-mono text-sm'>{organizationData.id}</p>
                         </div>
                         <div>
                             <p className='text-xs text-accent mb-1'>Organization Code</p>
-                            <p className='font-mono text-sm'>{organization.org_identifier}</p>
+                            <p className='font-mono text-sm'>{organizationData.organization_identifier}</p>
                         </div>
                     </div>
                 </div>
@@ -108,39 +138,39 @@ export const SingleOrganizationView = () => {
                 <div className='flex justify-between'>
                     <h2 className='text-2xl font-semibold mb-4'>Projects</h2>
                     <button
-                        onClick={() => navigate(`/organization/${organization.org_id}/projects/create`)}
+                        onClick={() => navigate(`/organization/${organizationData.id}/projects/create`)}
                         className='flex items-center gap-2 bg-accent px-2 mb-4 py-2 rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:cursor-pointer'
                     >
                         <FiPlusCircle className='h-5 w-5' />
                         Create Project
                     </button>
                 </div>
-                <DataTable
+                {/* <DataTable
                     data={projects}
                     columns={projectColumns}
                     getRowKey={(project) => project.project_id}
                     onRowClick={(project) => navigate(`/organization/${orgId}/project/${project.project_id}`)}
-                />
+                /> */}
             </div>
 
-            {isOwner && (
+            {user?.id === organizationData.owner?.id && (
                 <div className='flex w-full flex-wrap  gap-3 pb-4 justify-end'>
                     <button
-                        onClick={() => navigate(`/organization/${organization.org_id}/invite`)}
+                        onClick={() => navigate(`/organization/${organizationData.id}/invite`)}
                         className='flex items-center gap-2 bg-accent px-4 py-2 rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:cursor-pointer'
                     >
                         <FiUserPlus className='h-5 w-5' />
                         Invite Members
                     </button>
                     <button
-                        onClick={() => navigate(`/organization/${organization.org_id}/members`)}
+                        onClick={() => navigate(`/organization/${organizationData.id}/members`)}
                         className='flex items-center gap-2 bg-accent px-4 py-2 rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:cursor-pointer'
                     >
                         <FiUsers className='h-5 w-5' />
                         View Members
                     </button>
                     <button
-                        onClick={() => navigate(`/organization/${organization.org_id}/edit`)}
+                        onClick={() => navigate(`/organization/${organizationData.id}/edit`)}
                         className='flex items-center gap-2 bg-accent px-4 py-2 rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:cursor-pointer'
                     >
                         <FiEdit2 className='h-5 w-5' />

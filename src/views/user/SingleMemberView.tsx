@@ -1,12 +1,10 @@
-import { ORGANIZATIONS, USERS } from "@/constants/dummy-data";
+import { USERS } from "@/constants/dummy-data";
 import type { User } from '@/constants/dummy-data';
 
 import { FiEdit2 } from "react-icons/fi";
 import { GoArrowLeft } from "react-icons/go";
 import { useNavigate } from "react-router-dom";
 
-const singleMember = Object.values(USERS).filter(u => u.user_id === 'usr-001');
-const orgRepresented = Object.values(ORGANIZATIONS).filter(o => o.org_id === singleMember[0].org_id);
 export const SingleMemberView = () => {
     const navigate = useNavigate();
     return(
@@ -48,17 +46,17 @@ export const SingleMemberView = () => {
         
                             <div>
                                 <p className='text-sm text-accent mb-2'>Description</p>
-                                <p className='text-lg leading-relaxed'>{orgRepresented[0].org_description}</p>
+                                {/* <p className='text-lg leading-relaxed'>{orgRepresented[0].org_description}</p> */}
                             </div>
         
                             <div className='grid grid-cols-3 gap-4 pt-4 border-t'>
                                 <div>
                                     <p className='text-xs text-accent mb-1'>Organization ID</p>
-                                    <p className='font-mono text-sm'>{orgRepresented[0].org_id}</p>
+                                    {/* <p className='font-mono text-sm'>{orgRepresented[0].org_id}</p> */}
                                 </div>
                                 <div>
                                     <p className='text-xs text-accent mb-1'>Organization Code</p>
-                                    <p className='font-mono text-sm'>{orgRepresented[0].org_identifier}</p>
+                                    {/* <p className='font-mono text-sm'>{orgRepresented[0].org_identifier}</p> */}
                                 </div>
                                 <div>
                                     <p className='text-xs text-accent mb-1'>Role</p>
@@ -66,11 +64,11 @@ export const SingleMemberView = () => {
                                 </div>
                                 <div>
                                     <p className='text-xs text-accent mb-1'>Organization ID</p>
-                                    <p className='font-mono text-sm'>{orgRepresented[0].org_id}</p>
+                                    {/* <p className='font-mono text-sm'>{orgRepresented[0].org_id}</p> */}
                                 </div>
                                 <div>
                                     <p className='text-xs text-accent mb-1'>Organization Code</p>
-                                    <p className='font-mono text-sm'>{orgRepresented[0].org_identifier}</p>
+                                    {/* <p className='font-mono text-sm'>{orgRepresented[0].org_identifier}</p> */}
                                 </div>
                                 <div>
                                     <p className='text-xs text-accent mb-1'>Role</p>

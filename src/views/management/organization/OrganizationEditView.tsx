@@ -1,8 +1,14 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useParams } from "react-router-dom";
 import { GoArrowLeft } from "react-icons/go";
 import { FormField } from '@/components/input/FormField';
-import { ORGANIZATIONS } from "@/constants/dummy-data";
+import { useAuth } from '@/hooks/useAuth';
+
+import { getSpecificOrganizationRequest, organizationEditRequest } from '@/services/organizationService';
+
+import type { Organization } from '@/constants/dummy-data';
+
+import { BACKEND_URL } from '@/utils/axios';
 
 interface OrganizationEditErrors {
     OrgNameError: string;
@@ -11,40 +17,19 @@ interface OrganizationEditErrors {
     OrgPictureError: string;
 }
 
-const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png'];
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
 export const SingleOrganizationEditView = () => {
     const { orgId } = useParams();
     const navigate = useNavigate();
-
-    const organization = Object.values(ORGANIZATIONS).find(org => org.org_id === orgId);
-
-    if (!organization) {
-        return (
-            <div className='min-h-full flex items-center justify-center bg-darkened-surface'>
-                <h1 className='text-3xl'>Organization not found.</h1>
-            </div>
-        );
-    }
-
-    const [orgPicture, setOrgPicture] = useState<string | null>(null);
-    const [orgName, setOrgName] = useState<string>(organization.org_name);
-    const [orgIdentifier, setOrgIdentifier] = useState<string>(organization.org_identifier);
-    const [orgDescription, setOrgDescription] = useState<string>(organization.org_description);
+    const { user } = useAuth();
 
     const fileInputRef = useRef<HTMLInputElement>(null);
-
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setOrgPicture(reader.result as string);
-        };
-        reader.readAsDataURL(file);
-    };
-
+        
+    const [organizationData, setOrganizationData] = useState<Organization>();
+    const [isLoading, setIsLoading] = useState(true);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [errors, setErrors] = useState<OrganizationEditErrors>({
         OrgNameError: '',
         OrgIdentifierError: '',
@@ -52,42 +37,86 @@ export const SingleOrganizationEditView = () => {
         OrgPictureError: '',
     });
 
-    const validateImageType = (value: string | null): string => {
-        if (!value) return ''; // image is optional
-        const mimeMatch = value.match(/^data:([\w/]+);base64,/);
-        if (!mimeMatch) return 'Invalid image format.';
-        const mime = mimeMatch[1];
-        if (!ALLOWED_IMAGE_TYPES.includes(mime)) {
-            return 'Only JPG, JPEG, or PNG images are allowed.';
+    useEffect(() => {
+        const fetchSingleOrganization = async (organizationId: number) => {
+            try {
+                setIsLoading(true);
+                const data = await getSpecificOrganizationRequest(organizationId);
+                setOrganizationData(data);
+            } catch (error) {
+                console.error("Failed to fetch organization:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+
+        if (orgId) {
+            fetchSingleOrganization(Number(orgId));
+        }
+    }, [orgId]);
+
+    if (isLoading) {
+        return (
+            <div className='min-h-full flex items-center justify-center bg-darkened-surface'>
+                <h1 className='text-3xl text-white'>Loading...</h1>
+            </div>
+        );
+    }
+
+    if (!organizationData || user?.id != organizationData.owner_id) {
+        return (
+            <div className='min-h-full flex items-center justify-center bg-darkened-surface'>
+                <h1 className='text-3xl'>Organization not found.</h1>
+            </div>
+        );
+    }
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setSelectedFile(file);
+
+        const reader = new FileReader();
+        reader.onloadend = () => setPreviewUrl(reader.result as string);
+        reader.readAsDataURL(file);
+    };
+
+    const validateImageType = (): string => {
+        if (!selectedFile && !organizationData.organization_picture) {
+            return 'Provide a logo for your organization';
+        }
+        if (selectedFile && !ALLOWED_IMAGE_TYPES.includes(selectedFile.type)) {
+            return 'Only JPG, JPEG, PNG or WEBP images are allowed.';
         }
         return '';
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
+        console.log(organizationData);
         const newErrors: OrganizationEditErrors = {
             OrgNameError: '',
             OrgIdentifierError: '',
             OrgDescriptionError: '',
-            OrgPictureError: validateImageType(orgPicture),
+            OrgPictureError: validateImageType(),
         };
 
-        if (!orgName.trim()) {
+        if (!organizationData.organization_name.trim()) {
             newErrors.OrgNameError = 'Organization name is required.';
         }
 
-        if (!orgIdentifier.trim()) {
+        if (!organizationData.organization_identifier.trim()) {
             newErrors.OrgIdentifierError = 'Organization identifier is required.';
         }
-        if (orgIdentifier.length > 5) {
+        if (organizationData.organization_identifier.length > 5) {
             newErrors.OrgIdentifierError = 'Organization identifier must be 5 characters or less.';
         }
-        if (!/^[a-zA-Z0-9]+$/.test(orgIdentifier)) {
+        if (!/^[a-zA-Z0-9]+$/.test(organizationData.organization_identifier)) {
             newErrors.OrgIdentifierError = 'Organization identifier can only contain letters and numbers.';
         }
 
-        if (!orgDescription.trim()) {
+        if (!organizationData.organization_description.trim()) {
             newErrors.OrgDescriptionError = 'Organization description is required.';
         }
 
@@ -95,7 +124,37 @@ export const SingleOrganizationEditView = () => {
 
         if (Object.values(newErrors).some(e => e !== '')) return;
 
-        console.log('Organization updated successfully');
+        try {
+            await organizationEditRequest(
+                Number(orgId), 
+                organizationData.organization_name, 
+                organizationData.organization_identifier,
+                organizationData.organization_description,
+                selectedFile
+            );
+            navigate(-1);
+        } catch (error: any) {
+            if (error.response?.status === 422) {
+                const laravelErrors = error.response.data.errors;
+                console.log(laravelErrors);
+                setErrors({
+                    OrgNameError: laravelErrors.organization_name?.[0] ?? '',
+                    OrgIdentifierError: laravelErrors.organization_identifier?.[0] ?? '',
+                    OrgDescriptionError: laravelErrors.organization_description?.[0] ?? '',
+                    OrgPictureError: laravelErrors.organization_picture?.[0] ?? '',
+                });
+            }
+        }
+    };
+
+    const handleFieldChange = (key: keyof Organization) => (value: string) => {
+        setOrganizationData((prev) => {
+            if (!prev) return prev;
+            return {
+                ...prev,
+                [key]: value
+            };
+        });
     };
 
     return (
@@ -112,7 +171,7 @@ export const SingleOrganizationEditView = () => {
                     </button>
                     <div>
                         <p className='text-lg mb-0.5'>Currently Editing:</p>
-                        <p className='text-xl font-medium'>{organization.org_name}</p>
+                        <p className='text-xl font-medium'>{organizationData.organization_name}</p>
                     </div>
                 </div>
             </div>
@@ -126,7 +185,7 @@ export const SingleOrganizationEditView = () => {
                     <input
                         ref={fileInputRef}
                         type='file'
-                        accept='image/jpeg, image/jpg, image/png'
+                        accept='image/jpeg, image/jpg, image/png, image/webp'
                         className='hidden'
                         onChange={handleImageChange}
                     />
@@ -135,7 +194,7 @@ export const SingleOrganizationEditView = () => {
                         className='relative w-48 h-32 rounded-lg border border-dashed border-accent overflow-hidden group hover:cursor-pointer hover:border-primary transition-colors'
                     >
                         <img
-                            src={orgPicture ?? organization.picture}
+                            src={previewUrl ?? `${BACKEND_URL}/storage/${organizationData.organization_picture}`}
                             className='w-full h-full object-cover'
                             alt='Organization logo'
                         />
@@ -153,8 +212,8 @@ export const SingleOrganizationEditView = () => {
                     <FormField
                         name='org-edit-name'
                         label='Organization name'
-                        value={orgName}
-                        onChange={setOrgName}
+                        value={organizationData?.organization_name ||  ''}
+                        onChange={handleFieldChange('organization_name')}
                         config={{ type: 'text' }}
                         placeholder='Enter organization name...'
                         error={errors.OrgNameError}
@@ -162,8 +221,8 @@ export const SingleOrganizationEditView = () => {
                     <FormField
                         name='org-edit-identifier'
                         label='Organization identifier (max 5 letters/numbers)'
-                        value={orgIdentifier}
-                        onChange={setOrgIdentifier}
+                        value={organizationData?.organization_identifier || ''}
+                        onChange={handleFieldChange('organization_identifier')}
                         config={{ type: 'text' }}
                         placeholder='e.g., NXPAY'
                         error={errors.OrgIdentifierError}
@@ -173,8 +232,8 @@ export const SingleOrganizationEditView = () => {
                         <FormField
                             name='org-edit-description'
                             label='Organization description'
-                            value={orgDescription}
-                            onChange={setOrgDescription}
+                            value={organizationData?.organization_description || ''}
+                            onChange={handleFieldChange('organization_description')}
                             config={{ type: 'textarea', rows: 5 }}
                             placeholder='Enter organization description...'
                             error={errors.OrgDescriptionError}
