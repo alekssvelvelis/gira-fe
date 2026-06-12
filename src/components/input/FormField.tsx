@@ -9,7 +9,7 @@ type FieldConfig =
     | { type: 'image'; };
 
 
-export interface FormFieldProps {
+interface FormFieldProps {
     name: string;
     label: string;
     value: string;

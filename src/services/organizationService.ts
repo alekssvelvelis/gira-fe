@@ -52,3 +52,8 @@ export const getSpecificOrganizationRequest = async (organizationId: number) => 
     const response = await api.get(`/organizations/${organizationId}`);
     return response.data;
 };
+
+export const getOrganizationMembers = async (organizationId: number) => {
+    const response = await api.get(`/organizations/${organizationId}/users`);
+    return response.data;
+}

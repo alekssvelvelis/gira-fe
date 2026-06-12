@@ -4,7 +4,7 @@ import { GoArrowLeft } from 'react-icons/go';
 import { FiEdit2 } from 'react-icons/fi';
 import { FiPlusCircle } from 'react-icons/fi';
 
-import { TASKS, TASK_TYPE_CLASSES } from '@/constants/dummy-data';
+import { TASK_TYPE_CLASSES } from '@/constants/dummy-data';
 
 import type { Project } from '@/constants/dummy-data';
 import { DataTable } from '@/components/output/DataTable';
@@ -12,12 +12,13 @@ import { DataTable } from '@/components/output/DataTable';
 import type { ColumnDef } from '@/components/output/DataTable';
 import type { Task } from '@/constants/dummy-data';
 import { getSpecificProjectRequest } from '@/services/projectService';
-
+import { tasksGetRequest } from '@/services/taskService';
 export const SingleProjectView = () => {
     const navigate = useNavigate();
     const { orgId, projId } = useParams<{ orgId: string; projId: string }>();
     
     const [singleProjectData, setSingleProjectData] = useState<Project>();
+    const [singleProjectTasks, setSingleProjectTasks] = useState<Task[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -32,12 +33,25 @@ export const SingleProjectView = () => {
                 setIsLoading(false);
             }
         }
+
+        const fetchProjectTasks = async (organizationId: number, projectId: number) => {
+            try {
+                setIsLoading(true);   
+                const response = await tasksGetRequest(organizationId, projectId);
+                setSingleProjectTasks(response);
+            } catch (error) {
+                console.error("Failed to fetch single project tasks:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        }
         if(orgId && projId){
             fetchSingleProject(Number(orgId), Number(projId));
+            fetchProjectTasks(Number(orgId), Number(projId));
         }
     },[orgId, projId]);
 
-    console.log(singleProjectData);
+    console.log(singleProjectTasks);
     if (isLoading) {
         return (
             <div className='min-h-full flex items-center justify-center bg-darkened-surface'>
@@ -53,17 +67,16 @@ export const SingleProjectView = () => {
             </div>
         );
     }
-    const tasks = Object.values(TASKS).filter(t => t.project_id === projId);
     const taskColumns: ColumnDef<Task>[] = [
         {
             key: 'task_id',
             header: 'Task ID',
-            render: (task) => task.task_id,
+            render: (task) => task.id,
         },
         {
             key: 'status',
             header: 'Status',
-            render: (task) => task.status,
+            render: (task) => task.task_status,
         },
         {
             key: 'priority',
@@ -88,7 +101,7 @@ export const SingleProjectView = () => {
                     className='w-4 h-4 object-fit rounded-full'
                     src='https://www.shutterstock.com/image-vector/man-silhouette-icon-question-mark-260nw-192704537.jpg'
                     />
-                    {task.user_id}
+                    {task.assignee_id}
                 </div>
             ),
         },
@@ -138,10 +151,10 @@ export const SingleProjectView = () => {
                 <div className='pt-4 border-t'></div>
                 <div className='overflow-hidden overflow-x-scroll'>
                     <DataTable
-                        data={tasks}
+                        data={singleProjectTasks}
                         columns={taskColumns}
-                        getRowKey={(task) => task.task_id}
-                        onRowClick={(task) => navigate(`/organization/${orgId}/project/${projId}/tasks/${task.task_id}`)}
+                        getRowKey={(task) => task.id}
+                        onRowClick={(task) => navigate(`/organization/${orgId}/project/${projId}/tasks/${task.id}`)}
                     />
                 </div>
             </div>

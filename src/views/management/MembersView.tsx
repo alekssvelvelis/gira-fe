@@ -2,24 +2,37 @@
 import type { User } from '@/constants/dummy-data';
 import type { ColumnDef } from '@/components/output/DataTable';
 
+import { useState, useEffect } from 'react'; 
+
 import { DataTable } from "@/components/output/DataTable";
-import { USERS } from "@/constants/dummy-data";
 
 import { useNavigate } from 'react-router-dom';
 
 import { GoArrowLeft } from 'react-icons/go';
 import { useParams } from 'react-router-dom';
+import { getOrganizationMembers } from '@/services/organizationService';
 export const MemberView = () => {
     const { orgId } = useParams();
     const navigate = useNavigate();
-    const members = Object.values(USERS).filter(u => u.org_id === orgId);
 
+
+    const [organizationUsers, setOrganizationUsers] = useState<User[]>([]);
+
+    useEffect(() => {
+        const fetchOrganizationMembers = async (organizationId: number) => {
+            const response = await getOrganizationMembers(organizationId);
+            setOrganizationUsers(response);
+            console.log(response);
+        }
+
+        fetchOrganizationMembers(Number(orgId));
+    },[orgId])
 
     const userColumns: ColumnDef<User>[] = [
             {
                 key: 'user_id',
                 header: 'User ID',
-                render: (user) => user.user_id,
+                render: (user) => user.id,
             },
             {
                 key: 'email',
@@ -39,30 +52,24 @@ export const MemberView = () => {
                 <div className='flex items-center justify-between pb-3 border-b border-border mb-8'>
                         <div className='flex items-center gap-3'>
                             <button
-                                onClick={() => navigate(-1)}
+                                onClick={() => navigate(`/organization/${orgId}`)}
                                 className='flex items-center justify-center'
                                 aria-label='Go back'
                             >
                                 <GoArrowLeft className='h-6 w-6 flex-shrink-0 transition-all duration-300 hover:scale-110 hover:cursor-pointer' />
                             </button>
                             <div>
-                                <p className='text-lg mb-0.5'>Currently viewing:</p>
+                                <p className='text-lg mb-0.5'>Currently viewing members of:</p>
                                 <p className='text-xl font-medium'>{orgId}</p>
                             </div>
-                        </div>
-        
-                        <div className='flex items-center'>
-                            <span className='text-xl font-medium'>
-                                Created on: 23/06/2005
-                            </span>
                         </div>
                     </div>
                 <div>
                     <DataTable
-                        data={members}
+                        data={organizationUsers}
                         columns={userColumns}
-                        getRowKey={(user) => user.user_id}
-                        onRowClick={(user) => navigate(`/member/${user.user_id}`)}
+                        getRowKey={(user) => user.id}
+                        onRowClick={(user) => navigate(`/member/${user.id}`)}
                     />
                 </div>
             </div>

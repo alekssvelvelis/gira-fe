@@ -4,7 +4,7 @@ import type { Task } from '@/constants/dummy-data';
 import { DataTable } from '@/components/output/DataTable';
 import type { ColumnDef } from '@/components/output/DataTable';
 
-import { TASKS, TASK_TYPE_CLASSES } from '@/constants/dummy-data';
+import { TASK_TYPE_CLASSES } from '@/constants/dummy-data';
 import { useNavigate } from 'react-router-dom';
 
 import { useAuth } from '@/hooks/useAuth';
@@ -12,7 +12,7 @@ import { useAuth } from '@/hooks/useAuth';
 export const Dashboard = () => {
     const navigate = useNavigate();
     const [userTasks, setUserTasks] = useState({});
-    const tasks = Object.values(TASKS).filter(t => t.user_id === 'usr-006');
+    // const tasks = Object.values(TASKS).filter(t => t.user_id === 'usr-006');
 
     const { user } = useAuth();
         const taskColumns: ColumnDef<Task>[] = [
@@ -54,12 +54,12 @@ export const Dashboard = () => {
                     <h1 className='text-xl md:text-3xl font-light'>Your Dashboard</h1>
                     <h1 className='text-xl md:text-3xl font-light'>{user ? `Welcome, ${user.nickname}` : 'Welcome!'}</h1>
                 </div>
-                    <DataTable
+                    {/* <DataTable
                         data={tasks}
                         columns={taskColumns}
                         getRowKey={(task) => task.task_id}
                         onRowClick={(task) => navigate(`/task/${task.project_id}/${task.task_id}`)}
-                    />
+                    /> */}
             </div>
         </div>
     );

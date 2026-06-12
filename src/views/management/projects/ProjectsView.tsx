@@ -2,14 +2,13 @@ import type { Project } from '@/constants/dummy-data';
 import type { ColumnDef } from '@/components/output/DataTable';
 
 import { DataTable } from "@/components/output/DataTable";
-import { PROJECTS } from "@/constants/dummy-data";
 
 import { useNavigate, useParams } from 'react-router-dom';
 export const ProjectsView = () => {
 
     const navigate = useNavigate();
     const { orgId } = useParams<{ orgId: string }>();
-    const projects = Object.values(PROJECTS).filter(p => p.org_id === orgId);
+    // const projects = Object.values(PROJECTS).filter(p => p.org_id === orgId);
 
 
     const projectColumns: ColumnDef<Project>[] = [

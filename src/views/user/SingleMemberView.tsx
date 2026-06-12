@@ -1,4 +1,3 @@
-import { USERS } from "@/constants/dummy-data";
 import type { User } from '@/constants/dummy-data';
 
 import { FiEdit2 } from "react-icons/fi";

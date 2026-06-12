@@ -4,8 +4,7 @@ export const projectCreateRequest = async (
     projectName: string,
     projectDescription: string,
     organizationId: number,
-    ) => {
-    
+) => {
     const response = await api.post(`/organizations/${organizationId}/projects`, {
         'project_name': projectName,
         'project_description': projectDescription,
@@ -22,8 +21,7 @@ export const projectEditRequest = async (
     projectDescription: string,
     organizationId: number,
     projectId: number,
-    ) => {
-    
+) => {
     const response = await api.post(`/organizations/${organizationId}/projects/${projectId}`, {
         _method: 'PUT',
         'project_name': projectName,

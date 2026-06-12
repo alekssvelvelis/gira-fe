@@ -2,7 +2,6 @@ import { useState, useRef } from 'react';
 import { useNavigate, useParams } from "react-router-dom";
 import { GoArrowLeft } from "react-icons/go";
 import { FormField } from '@/components/input/FormField';
-import { USERS } from "@/constants/dummy-data";
 
 interface ProfileEditErrors {
     ProfileImageError: string;
@@ -20,7 +19,7 @@ export const UserEditView = () => {
     const { userId } = useParams();
     const navigate = useNavigate();
 
-    const specifiedUser = Object.values(USERS).filter(u => u.user_id === userId);
+    // const specifiedUser = Object.values(USERS).filter(u => u.user_id === userId);
 
     const [userProfilePicture, setUserProfilePicture] = useState<string | null>(null);
     const [userNickname, setUserNickname] = useState<string>(specifiedUser[0].nickname);

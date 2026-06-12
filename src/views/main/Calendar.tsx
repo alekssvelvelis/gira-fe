@@ -1,4 +1,4 @@
-import { TASKS, TASK_TYPE_CLASSES } from '@/constants/dummy-data';
+import { TASK_TYPE_CLASSES } from '@/constants/dummy-data';
 import type { Task } from '@/constants/dummy-data';
 
 import { DataTable } from '@/components/output/DataTable';
@@ -9,15 +9,15 @@ import { useNavigate } from 'react-router-dom';
 export const Calendar = () => {
 
     // Filter tasks for the user
-    const tasks = Object.values(TASKS).filter(t => t.user_id === 'usr-006');
+    // const tasks = Object.values(TASKS).filter(t => t.user_id === 'usr-006');
 
     // Group tasks by "YYYY-MM" month key
     const grouped: Record<string, Task[]> = {};
-    tasks.forEach(task => {
-        const key = task.due_date.slice(0, 7);
-        if (!grouped[key]) grouped[key] = [];
-        grouped[key].push(task);
-    });
+    // tasks.forEach(task => {
+    //     const key = task.due_date.slice(0, 7);
+    //     if (!grouped[key]) grouped[key] = [];
+    //     grouped[key].push(task);
+    // });
 
     // Sort months, and sort tasks within each month by due date
     const sortedMonths = Object.keys(grouped).sort();
@@ -67,12 +67,12 @@ export const Calendar = () => {
                 {sortedMonths.map(month => (
                     <div key={month}>
                         <h2 className='text-xl font-semibold mb-2'>{formatYearMonth(month)}</h2>
-                        <DataTable
+                        {/* <DataTable
                             data={grouped[month]}
                             columns={taskColumns}
                             getRowKey={(task) => task.task_id}
                             onRowClick={(task) => navigate(`/task/${task.project_id}/${task.task_id}`)}
-                        />
+                        /> */}
                     </div>
                 ))}
             </div>

@@ -1,47 +1,87 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
-import { TASKS, USERS, PROJECTS, STATUS_OPTIONS, PRIORITIES} from "@/constants/dummy-data";
+import { TASK_TYPES, PRIORITIES, STATUS_OPTIONS} from "@/constants/dummy-data";
 import { GoArrowLeft } from "react-icons/go";
 import { FormField } from '@/components/input/FormField';
+import { specificTaskGetRequest, } from '@/services/taskService';
+import { getOrganizationMembers } from '@/services/organizationService';
+import { toYYYYMMDD } from '@/utils/dateUtils';
+import type { Task, User } from '@/constants/dummy-data';
+import { taskEditRequest } from '@/services/taskService';
 
 interface TaskEditErrors {
     DescriptionError: string,
     AssignedUserError: string,
     DueDateError: string,
     PriorityError: string,
-    StatusTypeError: string,
+    TaskTypeError: string,
+    TaskStatusError: string,
 };
 
 export const TaskEditView = () => {
     const navigate = useNavigate();
-    const { projectId, taskId } = useParams<{ projectId: string; taskId: string }>();
-    const task = Object.values(TASKS).find(t => t.task_id === taskId);
+    const { orgId, projId, taskId } = useParams<{ orgId: string, projId: string; taskId: string }>();
 
-    if (!task) return (
+
+    const [singleTask, setSingleTask] = useState<Task>();
+    const [organizationUsers, setOrganizationUsers] = useState<User[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [errors, setErrors] = useState<TaskEditErrors>({
+        DescriptionError: '',
+        AssignedUserError: '',
+        DueDateError: '',
+        PriorityError: '',
+        TaskTypeError: '',
+        TaskStatusError: '',
+    });
+    useEffect(() => {
+        const fetchSingleTask = async (organizationId: number, projectId: number, taskId: number) => {
+            try {
+                setIsLoading(true);   
+                const response = await specificTaskGetRequest(organizationId,  projectId, taskId);
+                setSingleTask(response);
+            } catch (error) {
+                console.error("Failed to fetch single project:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+
+        const fetchOrganizationMembers = async (organizationId: number) => {
+            const response = await getOrganizationMembers(organizationId);
+            setOrganizationUsers(response);
+        }
+
+        if (orgId && projId && taskId){
+            fetchSingleTask(Number(orgId), Number(projId), Number(taskId));
+            fetchOrganizationMembers(Number(orgId));
+        }
+    },[orgId, projId, taskId]);
+
+    const handleFieldChange = (key: keyof Task) => (value: string) => {
+        setSingleTask((prev) => {
+            if (!prev) return prev;
+            return {
+                ...prev,
+                [key]: value
+            };
+        });
+    };
+
+    if (isLoading) {
+        return (
+            <div className='min-h-full flex items-center justify-center bg-darkened-surface'>
+                <h1 className='text-3xl text-white'>Loading...</h1>
+            </div>
+        );
+    }
+    
+    if (!singleTask) return (
         <div className='min-h-full flex items-center justify-center'>
-        <h1 className='text-3xl'>Task not found.</h1>
+            <h1 className='text-3xl'>Task not found.</h1>
         </div>
     );
-
-    const project = PROJECTS[task.project_id];
-    const orgUsers = Object.values(USERS).filter(user => user.org_id === project?.org_id);
-
-    const [taskDescription, setTaskDescription] = useState<string>(task.task_description);
-    const [assignedUser, setAssignedUser] = useState<string>(task.user_id);
-    const [dueDate, setDueDate] = useState<Date>(task.due_date);
-    const [priority, setPriority] = useState<number>(task.priority);
-    const [statusType, setStatusType] = useState<string>(task.status);
-
-    const selectedStatus = STATUS_OPTIONS.find(s => s.value === statusType);
-
-    const [errors, setErrors] = useState<TaskEditErrors>({
-            DescriptionError: '',
-            AssignedUserError: '',
-            DueDateError: '',
-            PriorityError: '',
-            StatusTypeError: '',
-    });
 
     const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -50,55 +90,84 @@ export const TaskEditView = () => {
             AssignedUserError: '',
             DueDateError: '',
             PriorityError: '',
-            StatusTypeError: '',
+            TaskTypeError: '',
+            TaskStatusError: '',
         };
 
-        if (!taskDescription || taskDescription.trim() == '') {
+        if (!singleTask.task_description || singleTask.task_description.trim() == '') {
             newErrors.DescriptionError = 'Task description is required';
         }
 
-        if (!assignedUser) {
+        if (!singleTask.assignee_id) {
             newErrors.AssignedUserError = 'Assigned user is required';
         }
 
-        if (!dueDate) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const selected = new Date(singleTask.due_date);
+
+        if (!singleTask.due_date) {
             newErrors.DueDateError = 'Due date is required';
-        } else if (dueDate < new Date()){
+        } else if (selected < today){
             newErrors.DueDateError = 'Due date cannot be in the past';
         }
 
-        if (!priority) {
+        if (!singleTask.priority) {
             newErrors.PriorityError = 'Task priority cannot be null';
-        } else if (priority < 1 || priority > 5){
+        } else if (Number(singleTask.priority) < 1 || Number(singleTask.priority) > 5){
             newErrors.PriorityError = 'Task priority is not in interval [1...5]'
         }
 
-        if (!statusType) {
-            newErrors.StatusTypeError = 'Task status is required'
+        if (!singleTask.task_type) {
+            newErrors.TaskTypeError = 'Task type is required'
+        }
+
+        if (!singleTask.task_status) {
+            newErrors.TaskStatusError = 'Task status is required'
         }
 
         setErrors(newErrors);
-        if (newErrors.DescriptionError || 
-            newErrors.AssignedUserError ||
-            newErrors.DueDateError ||
-            newErrors.PriorityError ||
-            newErrors.StatusTypeError
-        ) return;
-        console.log('got to end');
-    }
+        if (Object.values(newErrors).some(e => e !== '')) return;
 
-    const errorMsg = (msg?: string) => (
-        <p className={`text-sm mt-1 ${msg ? "text-red-500 visible" : "invisible"}`}>
-        {msg || "placeholder"}
-        </p>
-    );
+        try {
+            console.log(singleTask, 'edited');
+            await taskEditRequest(
+                Number(orgId), 
+                Number(projId), 
+                Number(taskId), 
+                singleTask.task_description, 
+                Number(singleTask.assignee_id), 
+                new Date(singleTask.due_date), 
+                Number(singleTask.priority), 
+                singleTask.task_type,
+                singleTask.task_status
+            );
+
+            navigate(`/organization/${orgId}/project/${projId}/tasks/${taskId}`);
+        } catch (error: any) {
+            if (error.response?.status === 422) {
+                const laravelErrors = error.response.data.errors;
+                console.log(laravelErrors);
+                setErrors({
+                    DescriptionError: laravelErrors.task_description?.[0] ?? '',
+                    AssignedUserError: laravelErrors.assignee_id?.[0] ?? '',
+                    DueDateError: laravelErrors.due_date?.[0] ?? '',
+                    PriorityError: laravelErrors.priority?.[0] ?? '',
+                    TaskTypeError: laravelErrors.task_type?.[0] ?? '',
+                    TaskStatusError: laravelErrors.task_status?.[0] ?? '',
+                });
+            }
+        }
+        console.log('Task edited successfully');
+    }
     
     return (
         <div className='relative min-h-full max-h-full overflow-y-scroll bg-darkened-surface p-4 md:p-6'>
             <div className='flex items-center justify-between pb-3 border-b border-border mb-5'>
                 <div className='flex items-center gap-3'>
                     <button
-                        onClick={() => navigate(-1)}
+                        onClick={() => navigate(`/organization/${orgId}/project/${projId}/tasks/${taskId}`)}
                         className='flex items-center justify-center'
                         aria-label='Go back'
                     >
@@ -106,7 +175,7 @@ export const TaskEditView = () => {
                     </button>
                     <div>
                         <p className='text-lg  mb-0.5'>Currently Editing:</p>
-                        <p className='text-xl font-medium font-mono'>{task.task_id}</p>
+                        <p className='text-xl font-medium font-mono'>{singleTask.id}</p>
                     </div>
                 </div>
             </div>
@@ -115,8 +184,8 @@ export const TaskEditView = () => {
                         <FormField
                             name='task-edit-description-input'
                             label='Task Description:'
-                            value={taskDescription}
-                            onChange={setTaskDescription}
+                            value={singleTask.task_description || ''}
+                            onChange={handleFieldChange('task_description')}
                             config={{type: 'textarea', rows: 4}}
                             placeholder='Enter task description...'
                             error={errors.DescriptionError}
@@ -125,11 +194,11 @@ export const TaskEditView = () => {
                         <FormField
                             name="assignedUser"
                             label="Assigned User"
-                            value={assignedUser}
-                            onChange={setAssignedUser}
-                            config={{ type: 'select', options: orgUsers.map(u => ({
-                                label: u.nickname ? `${u.nickname} (${u.email})` : u.email,
-                                value: u.user_id
+                            value={singleTask.assignee_id}
+                            onChange={handleFieldChange('assignee_id')}
+                            config={{ type: 'select', options: organizationUsers.map(u => ({
+                                label: u.nickname ? u.nickname : u.email,
+                                value: u.id
                             })) }}
                             placeholder="Select a user…"
                             error={errors.AssignedUserError}
@@ -138,36 +207,54 @@ export const TaskEditView = () => {
                         <FormField 
                             name="task-due-date-input"
                             label="Due Date"
-                            value={dueDate}
-                            onChange={setDueDate}
+                            value={toYYYYMMDD(singleTask.due_date)}
+                            onChange={handleFieldChange('due_date')}
+                            error={errors.DueDateError}
                             config={{type: 'date'}}
                         />
+                        
                     </div>
 
                     <div className="flex flex-col md:flex-row gap-4">
                         <FormField
                             name="task-priority-input"
                             label="Priority"
-                            value={priority}
-                            onChange={setPriority}
-                            config={{ type: 'select', options: PRIORITIES.map(p => ({
-                                label: p.label,
-                                value: p.value
+                            value={singleTask.priority.toString()}
+                            onChange={handleFieldChange('priority')}
+                            config={{ type: 'select', options: PRIORITIES.map(prio => ({
+                                label: prio.label,
+                                value: prio.value
                             })) }}
-                            placeholder="Select a user…"
-                            error={errors.AssignedUserError}
+                            placeholder="Select a priority…"
+                            error={errors.PriorityError}
+                            specialStyling={true}
+                        />
+
+                        <FormField 
+                            name='task-task-type-input'
+                            label='Type'
+                            value={singleTask.task_type}
+                            onChange={handleFieldChange('task_type')}
+                            config={{ type: 'select', options: TASK_TYPES.map(status => ({
+                                label: status.label,
+                                value: status.value
+                            })) }}
+                            placeholder="Select a task type..."
+                            error={errors.TaskTypeError}
                             specialStyling={true}
                         />
 
                         <FormField 
                             name='task-status-type-input'
-                            label='Status Type'
-                            value={statusType}
-                            onChange={setStatusType}
+                            label='Status'
+                            value={singleTask.task_status}
+                            onChange={handleFieldChange('task_status')}
                             config={{ type: 'select', options: STATUS_OPTIONS.map(status => ({
                                 label: status.label,
                                 value: status.value
                             })) }}
+                            placeholder="Select a task type..."
+                            error={errors.TaskStatusError}
                             specialStyling={true}
                         />
                     </div>
