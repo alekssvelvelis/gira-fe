@@ -11,25 +11,24 @@ interface OrganizationCreateErrors {
     OrgPictureError: string;
 }
 
-const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-
 export const SingleOrganizationCreateView = () => {
     const navigate = useNavigate();
 
-    const [orgPicture, setOrgPicture] = useState<string | null>(null);
+    const [orgPicture, setOrgPicture] = useState<File | null>(null);
     const [orgName, setOrgName] = useState<string>('');
     const [orgIdentifier, setOrgIdentifier] = useState<string>('');
     const [orgDescription, setOrgDescription] = useState<string>('');
+    const [orgPicturePreview, setOrgPicturePreview] = useState<string | null>(null);
+
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onloadend = () => setOrgPicture(reader.result as string);
-        reader.readAsDataURL(file);
+        if (file) {
+            setOrgPicture(file);
+            setOrgPicturePreview(URL.createObjectURL(file));
+        }
     };
 
     const [errors, setErrors] = useState<OrganizationCreateErrors>({
@@ -38,27 +37,20 @@ export const SingleOrganizationCreateView = () => {
         OrgDescriptionError: '',
         OrgPictureError: '',
     });
-    
-    const validateImageType = (value: string | null): string => {
-        if (!value) return 'Provide a logo for your organization';
-        const mimeMatch = value.match(/^data:([\w/]+);base64,/);
-        if (!mimeMatch) return 'Invalid image format.';
-        const mime = mimeMatch[1];
-        if (!ALLOWED_IMAGE_TYPES.includes(mime)) {
-            return 'Only JPG, JPEG, PNG or WEBP images are allowed.';
-        }
-        return '';
-    };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
+        console.log(orgPicture);
         const newErrors: OrganizationCreateErrors = {
             OrgNameError: '',
             OrgIdentifierError: '',
             OrgDescriptionError: '',
-            OrgPictureError: validateImageType(orgPicture),
+            OrgPictureError: '',
         };
+
+        if (!orgPicture) {
+            newErrors.OrgPictureError = 'Organization picture is required.';
+        }
 
         if (!orgName.trim()) {
             newErrors.OrgNameError = 'Organization name is required.';
@@ -82,7 +74,9 @@ export const SingleOrganizationCreateView = () => {
 
         if (Object.values(newErrors).some(e => e !== '')) return;
         try {
-            await organizationCreateRequest(orgName, orgIdentifier, orgDescription,  orgPicture ? orgPicture : '');
+            if (orgPicture) {
+                await organizationCreateRequest(orgName, orgIdentifier, orgDescription, orgPicture);
+            }
             navigate(-1);
         } catch (error: any) {
             if (error.response?.status === 422) {
@@ -135,7 +129,7 @@ export const SingleOrganizationCreateView = () => {
                         className='relative w-48 h-32 rounded-lg border border-dashed border-accent overflow-hidden group hover:cursor-pointer hover:border-primary transition-colors'
                     >
                         <img
-                            src={orgPicture ?? 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Question_Mark.svg/3840px-Question_Mark.svg.png'}
+                            src={orgPicturePreview ?? 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Question_Mark.svg/3840px-Question_Mark.svg.png'}
                             className='w-full h-full object-cover'
                             alt='Organization logo'
                         />

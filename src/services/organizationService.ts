@@ -4,16 +4,15 @@ export const organizationCreateRequest = async (
     organizationName: string, 
     organizationIdentifier: string, 
     organizationDescription: string, 
-    organizationImage: string
+    organizationImage: File
     ) => {
 
     const formData = new FormData();
     formData.append('organization_name', organizationName);
     formData.append('organization_identifier', organizationIdentifier);
     formData.append('organization_description', organizationDescription);
+    formData.append('organization_picture', organizationImage);
 
-    const blob = await fetch(organizationImage).then(read => read.blob());
-    formData.append('organization_picture', blob, 'org_picture');
     
     const response = await api.post('/organizations', formData);
 

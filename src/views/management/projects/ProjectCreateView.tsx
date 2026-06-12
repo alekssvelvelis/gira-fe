@@ -2,7 +2,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { GoArrowLeft } from 'react-icons/go';
 import { useState } from 'react';
 import { FormField } from '@/components/input/FormField';
-
+import { projectCreateRequest } from '@/services/projectService';
 interface ProjectCreateErrors {
     ProjectNameError: string;
     ProjectDescriptionError: string;
@@ -39,7 +39,19 @@ export const ProjectCreateView = () => {
         setErrors(newErrors);
 
         if (Object.values(newErrors).some(e => e !== '')) return;
-
+        try {
+            await projectCreateRequest(projectName, projectDescription, Number(orgId));
+            navigate(-1);
+        } catch (error: any) {
+            if (error.response?.status === 422) {
+                const laravelErrors = error.response.data.errors;
+                console.log(laravelErrors);
+                setErrors({
+                    ProjectNameError: laravelErrors.project_name?.[0] ?? '',
+                    ProjectDescriptionError: laravelErrors.organization_identifier?.[0] ?? '',
+                });
+            }
+        }
         console.log('Project created successfully');
     };
 

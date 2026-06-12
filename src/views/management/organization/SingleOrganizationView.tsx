@@ -4,8 +4,9 @@ import { GoArrowLeft } from 'react-icons/go';
 import { FiEdit2, FiUserPlus, FiUsers, FiPlusCircle } from 'react-icons/fi';
 
 import { getSpecificOrganizationRequest } from '@/services/organizationService';
+import { projectsGetRequest } from '@/services/projectService'; 
 
-import type { Organization } from '@/constants/dummy-data';
+import type { Organization, Project } from '@/constants/dummy-data';
 import type { ColumnDef } from '@/components/output/DataTable';
 
 import { DataTable } from '@/components/output/DataTable';
@@ -19,7 +20,8 @@ export const SingleOrganizationView = () => {
     const { user } = useAuth();
     
     const [organizationData, setOrganizationData] = useState<Organization>();
-    const [isLoading, setIsLoading] = useState(true);
+    const [projectData, setProjectData] = useState<Project[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
     
 
     useEffect(() => {
@@ -35,8 +37,22 @@ export const SingleOrganizationView = () => {
             }
         }
 
+        const fetchSingleOrganizationProjects = async (organizationId: number) => {
+            try {
+                setIsLoading(true);
+                const data = await projectsGetRequest(organizationId);
+                setProjectData(data);
+            } catch (error) {
+                console.error("Failed to fetch organization projects:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+
         if (orgId) {
             fetchSingleOrganization(Number(orgId));
+            fetchSingleOrganizationProjects(Number(orgId));
+            
         }
     }, [orgId]);
 
@@ -55,22 +71,24 @@ export const SingleOrganizationView = () => {
             </div>
         );
     }
+
+    console.log(projectData);
     
     const projectColumns: ColumnDef<Project>[] = [
         {
-            key: 'project_id',
+            key: 'id',
             header: 'Project ID',
-            render: (project) => project.project_id,
+            render: (project) => project.id,
         },
         {
-            key: 'name',
+            key: 'project_name',
             header: 'Name',
-            render: (project) => project.name,
+            render: (project) => project.project_name,
         },
         {
-            key: 'description',
+            key: 'project_description',
             header: 'Description',
-            render: (project) => project.description,
+            render: (project) => project.project_description,
         },
     ];
 
@@ -80,7 +98,7 @@ export const SingleOrganizationView = () => {
             <div className='flex items-center justify-between pb-3 border-b border-border mb-8'>
                 <div className='flex items-center gap-3'>
                     <button
-                        onClick={() => navigate(-1)}
+                        onClick={() => navigate(`/organizations`)}
                         className='flex items-center justify-center'
                         aria-label='Go back'
                     >
@@ -145,12 +163,12 @@ export const SingleOrganizationView = () => {
                         Create Project
                     </button>
                 </div>
-                {/* <DataTable
-                    data={projects}
+                <DataTable
+                    data={projectData}
                     columns={projectColumns}
-                    getRowKey={(project) => project.project_id}
-                    onRowClick={(project) => navigate(`/organization/${orgId}/project/${project.project_id}`)}
-                /> */}
+                    getRowKey={(project) => project.id}
+                    onRowClick={(project) => navigate(`/organization/${orgId}/project/${project.id}`)}
+                />
             </div>
 
             {user?.id === organizationData.owner?.id && (

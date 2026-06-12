@@ -42,12 +42,10 @@ export interface User {
 }
 
 export interface Project {
-  id:  number;
-  owner_id: number;
-  organization_name: string;
-  organization_description: string;
-  organization_identifier: string;   
-  organization_picture: string;
+  id: number;
+  organization_id: number;
+  project_name: string;
+  project_description: string;
   created_at: Date;
 }
 

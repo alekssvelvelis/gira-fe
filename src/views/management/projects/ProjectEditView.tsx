@@ -1,9 +1,11 @@
-import { PROJECTS } from '@/constants/dummy-data';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { GoArrowLeft } from 'react-icons/go';
 import { FiEdit2 } from 'react-icons/fi';
-import { useState } from 'react';
 import { FormField } from '@/components/input/FormField';
+import { getSpecificProjectRequest, projectEditRequest } from '@/services/projectService';
+
+import type { Project } from '@/constants/dummy-data';
 
 interface ProjectEditErrors {
     ProjectNameError: string;
@@ -13,21 +15,54 @@ interface ProjectEditErrors {
 export const ProjectEditView = () => {
     const navigate = useNavigate();
     const { orgId, projId } = useParams<{ orgId: string; projId: string }>();
-    const project = Object.values(PROJECTS).find(p => p.project_id === projId);
 
-    if (!project) return (
-        <div className='min-h-full flex items-center justify-center'>
-            <h1 className='text-3xl'>Project not found.</h1>
-        </div>
-    );
-
-    const [projectName, setProjectName] = useState<string>(project.name);
-    const [projectDescription, setProjectDescription] = useState<string>(project.description);
-
+    const [singleProjectData, setSingleProjectData] = useState<Project>();
+    const [isLoading, setIsLoading] = useState<boolean>(true);
     const [errors, setErrors] = useState<ProjectEditErrors>({
         ProjectNameError: '',
         ProjectDescriptionError: '',
     });
+
+    useEffect(() => {
+        const fetchSingleProject = async (organizationId: number, projectId: number) => {
+            try {
+                setIsLoading(true);   
+                const response = await getSpecificProjectRequest(organizationId, projectId);
+                setSingleProjectData(response);
+            } catch (error) {
+                console.error("Failed to fetch single project:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+        if(orgId && projId){
+            fetchSingleProject(Number(orgId), Number(projId));
+        }
+    },[orgId, projId]);
+
+    const handleFieldChange = (key: keyof Project) => (value: string) => {
+        setSingleProjectData((prev) => {
+            if (!prev) return prev;
+            return {
+                ...prev,
+                [key]: value
+            };
+        });
+    };
+
+    if (isLoading) {
+        return (
+            <div className='min-h-full flex items-center justify-center bg-darkened-surface'>
+                <h1 className='text-3xl text-white'>Loading...</h1>
+            </div>
+        );
+    }
+    
+    if (!singleProjectData) return (
+        <div className='min-h-full flex items-center justify-center'>
+            <h1 className='text-3xl'>Project not found.</h1>
+        </div>
+    );
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -37,18 +72,35 @@ export const ProjectEditView = () => {
             ProjectDescriptionError: '',
         };
 
-        if (!projectName.trim()) {
+        if (!singleProjectData.project_name.trim()) {
             newErrors.ProjectNameError = 'Project name is required.';
         }
 
-        if (!projectDescription.trim()) {
+        if (!singleProjectData.project_description.trim()) {
             newErrors.ProjectDescriptionError = 'Project description is required.';
         }
 
         setErrors(newErrors);
 
         if (Object.values(newErrors).some(e => e !== '')) return;
-
+        try {
+            await projectEditRequest(
+                singleProjectData.project_name,
+                singleProjectData.project_description,
+                Number(orgId),
+                Number(projId)
+            );
+            navigate(`/organization/${orgId}/project/${projId}`);
+        } catch (error: any) {
+            if (error.response?.status === 422) {
+                const laravelErrors = error.response.data.errors;
+                console.log(laravelErrors);
+                setErrors({
+                    ProjectNameError: laravelErrors.project_name?.[0] ?? '',
+                    ProjectDescriptionError: laravelErrors.project_description?.[0] ?? '',
+                });
+            }
+        }
         console.log('Project updated successfully');
     };
 
@@ -58,7 +110,7 @@ export const ProjectEditView = () => {
             <div className='flex items-center justify-between pb-3 border-b border-border mb-5'>
                 <div className='flex items-center gap-3'>
                     <button
-                        onClick={() => navigate(-1)}
+                        onClick={() => navigate(`/organization/${orgId}/project/${projId}`)}
                         className='flex items-center justify-center'
                         aria-label='Go back'
                     >
@@ -66,7 +118,7 @@ export const ProjectEditView = () => {
                     </button>
                     <div>
                         <p className='text-lg mb-0.5'>Editing project</p>
-                        <p className='text-xl font-medium font-mono'>{project.project_id}</p>
+                        <p className='text-xl font-medium font-mono'>{singleProjectData?.id}</p>
                     </div>
                 </div>
             </div>
@@ -80,8 +132,8 @@ export const ProjectEditView = () => {
                     <FormField
                         name='project-edit-name'
                         label='Project name'
-                        value={projectName}
-                        onChange={setProjectName}
+                        value={singleProjectData?.project_name || ''}
+                        onChange={handleFieldChange('project_name')}
                         config={{ type: 'text' }}
                         placeholder='Enter project name...'
                         error={errors.ProjectNameError}
@@ -89,17 +141,15 @@ export const ProjectEditView = () => {
                 </div>
 
                 <div>
-                    <label className='block text-sm font-medium mb-2'>Project description</label>
-                    <textarea
-                        value={projectDescription}
-                        onChange={(e) => setProjectDescription(e.target.value)}
-                        placeholder='Enter project description...'
-                        className='w-full px-3 py-2 border border-border rounded-lg bg-surface text-sidebar-text focus:outline-none focus:ring-2 focus:ring-accent'
-                        rows={6}
+                    <FormField
+                        name='project-edit-description'
+                        label='Project description'
+                        value={singleProjectData?.project_description || ''}
+                        onChange={handleFieldChange('project_description')}
+                        config={{ type: 'textarea', rows: 5 }}
+                        placeholder='Enter organization description...'
+                        error={errors.ProjectDescriptionError}
                     />
-                    {errors.ProjectDescriptionError && (
-                        <p className='text-red-500 text-sm mt-1'>{errors.ProjectDescriptionError}</p>
-                    )}
                 </div>
 
                 <button

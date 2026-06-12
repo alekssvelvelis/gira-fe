@@ -17,8 +17,6 @@ interface OrganizationEditErrors {
     OrgPictureError: string;
 }
 
-const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-
 export const SingleOrganizationEditView = () => {
     const { orgId } = useParams();
     const navigate = useNavigate();
@@ -73,23 +71,10 @@ export const SingleOrganizationEditView = () => {
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (!file) return;
-
-        setSelectedFile(file);
-
-        const reader = new FileReader();
-        reader.onloadend = () => setPreviewUrl(reader.result as string);
-        reader.readAsDataURL(file);
-    };
-
-    const validateImageType = (): string => {
-        if (!selectedFile && !organizationData.organization_picture) {
-            return 'Provide a logo for your organization';
+        if (file) {
+            setSelectedFile(file);
+            setPreviewUrl(URL.createObjectURL(file));
         }
-        if (selectedFile && !ALLOWED_IMAGE_TYPES.includes(selectedFile.type)) {
-            return 'Only JPG, JPEG, PNG or WEBP images are allowed.';
-        }
-        return '';
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -99,7 +84,7 @@ export const SingleOrganizationEditView = () => {
             OrgNameError: '',
             OrgIdentifierError: '',
             OrgDescriptionError: '',
-            OrgPictureError: validateImageType(),
+            OrgPictureError: '',
         };
 
         if (!organizationData.organization_name.trim()) {
@@ -130,9 +115,9 @@ export const SingleOrganizationEditView = () => {
                 organizationData.organization_name, 
                 organizationData.organization_identifier,
                 organizationData.organization_description,
-                selectedFile
+                selectedFile? selectedFile : undefined
             );
-            navigate(-1);
+            navigate(`/organization/${orgId}`);
         } catch (error: any) {
             if (error.response?.status === 422) {
                 const laravelErrors = error.response.data.errors;

@@ -1,20 +1,52 @@
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { GoArrowLeft } from 'react-icons/go';
 import { FiEdit2 } from 'react-icons/fi';
 import { FiPlusCircle } from 'react-icons/fi';
-import { PROJECTS, TASKS, TASK_TYPE_CLASSES } from '@/constants/dummy-data';
+
+import { TASKS, TASK_TYPE_CLASSES } from '@/constants/dummy-data';
+
+import type { Project } from '@/constants/dummy-data';
 import { DataTable } from '@/components/output/DataTable';
 
 import type { ColumnDef } from '@/components/output/DataTable';
 import type { Task } from '@/constants/dummy-data';
+import { getSpecificProjectRequest } from '@/services/projectService';
 
 export const SingleProjectView = () => {
     const navigate = useNavigate();
     const { orgId, projId } = useParams<{ orgId: string; projId: string }>();
     
-    const project = Object.values(PROJECTS).find(p => p.project_id === projId);
-    
-    if (!project) {
+    const [singleProjectData, setSingleProjectData] = useState<Project>();
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchSingleProject = async (organizationId: number, projectId: number) => {
+            try {
+                setIsLoading(true);   
+                const response = await getSpecificProjectRequest(organizationId, projectId);
+                setSingleProjectData(response);
+            } catch (error) {
+                console.error("Failed to fetch single project:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+        if(orgId && projId){
+            fetchSingleProject(Number(orgId), Number(projId));
+        }
+    },[orgId, projId]);
+
+    console.log(singleProjectData);
+    if (isLoading) {
+        return (
+            <div className='min-h-full flex items-center justify-center bg-darkened-surface'>
+                <h1 className='text-3xl text-white'>Loading...</h1>
+            </div>
+        );
+    }
+
+    if (!singleProjectData) {
         return (
             <div className='min-h-full flex items-center justify-center bg-darkened-surface'>
                 <h1 className='text-3xl'>Project not found.</h1>
@@ -73,7 +105,7 @@ export const SingleProjectView = () => {
             <div className='flex items-center justify-between pb-3 border-b border-border mb-8'>
                 <div className='flex items-center gap-3'>
                     <button
-                        onClick={() => navigate(-1)}
+                        onClick={() => navigate(`/organization/${orgId}`)}
                         className='flex items-center justify-center'
                         aria-label='Go back'
                     >
@@ -81,13 +113,13 @@ export const SingleProjectView = () => {
                     </button>
                     <div>
                         <p className='text-lg mb-0.5'>Currently viewing:</p>
-                        <p className='text-xl font-medium'>{project.name}</p>
+                        <p className='text-xl font-medium'>{singleProjectData?.project_name}</p>
                     </div>
                 </div>
 
                 <div className='flex items-center gap-2'>
                     <span className='text-sm bg-primary text-secondary px-4 py-2 rounded-lg font-medium'>
-                        {project.org_id}
+                        {singleProjectData?.organization_id}
                     </span>
                 </div>
             </div>
@@ -95,12 +127,12 @@ export const SingleProjectView = () => {
             <div className='flex flex-col gap-6 mb-8'>
                 <div>
                     <p className='text-sm text-accent mb-2'>Project Name</p>
-                    <p className='text-2xl font-semibold'>{project.name} [ {project.project_id} ]</p>
+                    <p className='text-2xl font-semibold'>{singleProjectData?.project_name} [ {singleProjectData?.id} ]</p>
                 </div>
 
                 <div>
                     <p className='text-sm text-accent mb-2'>Description</p>
-                    <p className='text-lg leading-relaxed'>{project.description}</p>
+                    <p className='text-lg leading-relaxed'>{singleProjectData?.project_description}</p>
                 </div>
 
                 <div className='pt-4 border-t'></div>
@@ -116,14 +148,14 @@ export const SingleProjectView = () => {
 
             <div className='flex w-full flex-wrap gap-3 pb-4 justify-end'>
                 <button
-                    onClick={() => navigate(`/organization/${orgId}/project/${project.project_id}/edit`)}
+                    onClick={() => navigate(`/organization/${orgId}/project/${singleProjectData?.id}/edit`)}
                     className='flex items-center gap-2 bg-accent px-4 py-2 rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:cursor-pointer'
                 >
                     <FiEdit2 className='h-5 w-5' />
                     Edit Project
                 </button>
                 <button
-                    onClick={() => navigate(`/organization/${orgId}/project/${project.project_id}/tasks/create`)}
+                    onClick={() => navigate(`/organization/${orgId}/project/${singleProjectData?.id}/tasks/create`)}
                     className='flex items-center gap-2 bg-accent px-4 py-2 rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:cursor-pointer'
                 >
                     <FiPlusCircle className='h-5 w-5' />

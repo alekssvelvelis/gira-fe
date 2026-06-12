@@ -9,7 +9,7 @@ export interface DataTableProps<T> {
     data: T[];
     columns: ColumnDef<T>[];
     onRowClick?: (row: T) => void;
-    getRowKey: (row: T) => string;
+    getRowKey: (row: T) => string | number;
 }
 
 export function DataTable<T>({ data, columns, onRowClick, getRowKey }: DataTableProps<T>) {
