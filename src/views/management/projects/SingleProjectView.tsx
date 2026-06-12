@@ -20,7 +20,6 @@ export const SingleProjectView = () => {
     const [singleProjectData, setSingleProjectData] = useState<Project>();
     const [singleProjectTasks, setSingleProjectTasks] = useState<Task[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-
     useEffect(() => {
         const fetchSingleProject = async (organizationId: number, projectId: number) => {
             try {
@@ -50,8 +49,7 @@ export const SingleProjectView = () => {
             fetchProjectTasks(Number(orgId), Number(projId));
         }
     },[orgId, projId]);
-
-    console.log(singleProjectTasks);
+    
     if (isLoading) {
         return (
             <div className='min-h-full flex items-center justify-center bg-darkened-surface'>
@@ -160,6 +158,7 @@ export const SingleProjectView = () => {
             </div>
 
             <div className='flex w-full flex-wrap gap-3 pb-4 justify-end'>
+
                 <button
                     onClick={() => navigate(`/organization/${orgId}/project/${singleProjectData?.id}/edit`)}
                     className='flex items-center gap-2 bg-accent px-4 py-2 rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:cursor-pointer'

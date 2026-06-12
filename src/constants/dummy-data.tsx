@@ -38,6 +38,8 @@ export interface User {
   id: string;
   email: string;
   nickname: string | null;
+  created_at: string,
+  profile_picture: string,
 }
 
 export interface Project {
