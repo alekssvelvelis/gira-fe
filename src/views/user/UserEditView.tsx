@@ -1,7 +1,13 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useParams } from "react-router-dom";
 import { GoArrowLeft } from "react-icons/go";
 import { FormField } from '@/components/input/FormField';
+import { getSpecificUser } from '@/services/userService';
+import { BACKEND_URL } from '@/utils/axios';
+import { userEditRequest } from '@/services/userService';
+
+import type { User } from '@/constants/dummy-data';
+
 
 interface ProfileEditErrors {
     ProfileImageError: string;
@@ -12,30 +18,44 @@ interface ProfileEditErrors {
     CurrentPasswordError: string;
 }
 
-const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png'];
-
 export const UserEditView = () => {
-
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const { userId } = useParams();
     const navigate = useNavigate();
+    const [userData, setUserData] = useState<User>();
 
-    // const specifiedUser = Object.values(USERS).filter(u => u.user_id === userId);
+    useEffect(() => {
+        const fetchUser = async(userId: number) => {
+            const response = await getSpecificUser(userId);
+            setUserData(response);
+        }
+        
+        fetchUser(Number(userId));
+    },[userId]);
 
-    const [userProfilePicture, setUserProfilePicture] = useState<string | null>(null);
-    const [userNickname, setUserNickname] = useState<string>(specifiedUser[0].nickname);
-    const [userEmail, setUserEmail] = useState<string>(specifiedUser[0].email);
+    const handleFieldChange = (key: keyof User) => (value: string) => {
+        setUserData((prev) => {
+            if (!prev) return prev;
+            return {
+                ...prev,
+                [key]: value
+            };
+        });
+    };
+
     const [userNewPassword, setUserNewPassword] = useState<string>('');
     const [userConfirmedNewPassword, setUserConfirmedNewPassword] = useState<string>('');
     const [userCurrentPassword, setUserCurrentPassword] = useState<string>('');
 
-        const fileInputRef = useRef<HTMLInputElement>(null);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onloadend = () => setUserProfilePicture(reader.result as string);
-        reader.readAsDataURL(file);
+        if (file) {
+            setSelectedFile(file);
+            setPreviewUrl(URL.createObjectURL(file));
+        }
     };
 
     const [errors, setErrors] = useState<ProfileEditErrors>({
@@ -48,17 +68,6 @@ export const UserEditView = () => {
     });
 
 
-    const validateImageType = (value: string | null): string => {
-        if (!value) return ''; // image is optional
-        const mimeMatch = value.match(/^data:([\w/]+);base64,/);
-        if (!mimeMatch) return 'Invalid image format.';
-        const mime = mimeMatch[1];
-        if (!ALLOWED_IMAGE_TYPES.includes(mime)) {
-            return 'Only JPG, JPEG, or PNG images are allowed.';
-        }
-        return '';
-    };
-
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -66,7 +75,7 @@ export const UserEditView = () => {
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
 
         const newErrors: ProfileEditErrors = {
-            ProfileImageError: validateImageType(userProfilePicture),
+            ProfileImageError: '',
             NicknameError: '',
             EmailError: '',
             NewPasswordError: '',
@@ -74,13 +83,13 @@ export const UserEditView = () => {
             CurrentPasswordError: '',
         };
 
-        if (!userNickname.trim()) {
+        if (!userData?.nickname || !userData?.nickname.trim()) {
             newErrors.NicknameError = 'Nickname is required.';
         }
 
-        if (!userEmail.trim()) {
+        if (!userData?.email || !userData?.email.trim()) {
             newErrors.EmailError = 'Email is required.';
-        } else if (!emailPattern.test(userEmail.trim())) {
+        } else if (!emailPattern.test(userData?.email.trim())) {
             newErrors.EmailError = 'Please enter a valid email.';
         }
 
@@ -107,7 +116,31 @@ export const UserEditView = () => {
         setErrors(newErrors);
 
         if (Object.values(newErrors).some(e => e !== '')) return;
-        
+        try {
+            await userEditRequest(
+                Number(userId), 
+                userData?.email, 
+                userData?.nickname,
+                userCurrentPassword,
+                userNewPassword ? userNewPassword : null,
+                userConfirmedNewPassword ? userConfirmedNewPassword : null,
+                selectedFile? selectedFile : undefined
+            );
+            navigate(`/member/${userId}`);
+        } catch (error: any) {
+            if (error.response?.status === 422) {
+                const laravelErrors = error.response.data.errors;
+                console.log(laravelErrors);
+                setErrors({
+                    ProfileImageError: laravelErrors.profile_picture?.[0] ?? '',
+                    NicknameError: laravelErrors.nickname?.[0] ?? '',
+                    EmailError: laravelErrors.email?.[0] ?? '',
+                    NewPasswordError: laravelErrors.new_password?.[0] ?? '',
+                    ConfirmedNewPasswordError: laravelErrors.confirmed_new_password?.[0] ?? '',
+                    CurrentPasswordError: laravelErrors.password?.[0] ?? '',
+                });
+            }
+        }
     };
 
     return (
@@ -116,7 +149,7 @@ export const UserEditView = () => {
             <div className='flex items-center justify-between pb-3 border-b border-border mb-5'>
                 <div className='flex items-center gap-3'>
                     <button
-                        onClick={() => navigate(-1)}
+                        onClick={() => navigate(`/member/${userId}`)}
                         className='flex items-center justify-center'
                         aria-label='Go back'
                     >
@@ -124,7 +157,7 @@ export const UserEditView = () => {
                     </button>
                     <div>
                         <p className='text-lg mb-0.5'>Currently Editing:</p>
-                        <p className='text-xl font-medium font-mono'>{specifiedUser[0].user_id}</p>
+                        <p className='text-xl font-medium font-mono'>{userData?.id}</p>
                     </div>
                 </div>
             </div>
@@ -147,7 +180,7 @@ export const UserEditView = () => {
                         className='relative w-24 h-24 rounded-full border overflow-hidden group hover:cursor-pointer'
                     >
                         <img
-                            src={userProfilePicture ?? 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIf4R5qPKHPNMyAqV-FjS_OTBB8pfUV29Phg&s'}
+                            src={previewUrl ?? `${BACKEND_URL}/storage/${userData?.profile_picture}`}
                             className='w-full h-full object-cover'
                             alt='Profile picture'
                         />
@@ -166,8 +199,8 @@ export const UserEditView = () => {
                     <FormField
                         name='user-edit-nickname'
                         label='User nickname'
-                        value={userNickname}
-                        onChange={setUserNickname}
+                        value={userData?.nickname || ''}
+                        onChange={handleFieldChange('nickname')}
                         config={{ type: 'text' }}
                         placeholder='Enter user nickname...'
                         error={errors.NicknameError}
@@ -175,8 +208,8 @@ export const UserEditView = () => {
                     <FormField
                         name='user-edit-email'
                         label='User email'
-                        value={userEmail}
-                        onChange={setUserEmail}
+                        value={userData?.email || ''}
+                        onChange={handleFieldChange('email')}
                         config={{ type: 'email' }}
                         placeholder='Enter user email...'
                         error={errors.EmailError}
@@ -200,7 +233,6 @@ export const UserEditView = () => {
                         error={errors.ConfirmedNewPasswordError}
                     />
 
-                    {/* Current password spans full width so it stands apart visually */}
                     <div className='lg:col-span-2'>
                         <FormField
                             name='user-edit-current-password'

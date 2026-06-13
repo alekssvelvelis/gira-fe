@@ -14,6 +14,8 @@ import { BACKEND_URL } from '@/utils/axios';
 
 import { useAuth } from '@/hooks/useAuth';
 
+import { InviteMember } from '@/components/input/InviteMember';
+
 export const SingleOrganizationView = () => {
     const navigate = useNavigate();
     const { orgId } = useParams<{ orgId: string }>();
@@ -22,7 +24,7 @@ export const SingleOrganizationView = () => {
     const [organizationData, setOrganizationData] = useState<Organization>();
     const [projectData, setProjectData] = useState<Project[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    
+    const [isInvitingShown, setInvitingShown] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchSingleOrganization = async (organizationId: number) => {
@@ -94,7 +96,12 @@ export const SingleOrganizationView = () => {
 
     return (
         <div className='relative min-h-full flex flex-col max-h-full overflow-y-scroll bg-darkened-surface p-4 md:p-6'>
-
+            {isInvitingShown && (
+                <InviteMember
+                    organizationId={orgId}
+                    onClose={() => setInvitingShown(false)}
+                />
+            )}
             <div className='flex items-center justify-between pb-3 border-b border-border mb-8'>
                 <div className='flex items-center gap-3'>
                     <button
@@ -155,13 +162,15 @@ export const SingleOrganizationView = () => {
             <div className='mb-8'>
                 <div className='flex justify-between'>
                     <h2 className='text-2xl font-semibold mb-4'>Projects</h2>
-                    <button
-                        onClick={() => navigate(`/organization/${organizationData.id}/projects/create`)}
-                        className='flex items-center gap-2 bg-accent px-2 mb-4 py-2 rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:cursor-pointer'
-                    >
-                        <FiPlusCircle className='h-5 w-5' />
-                        Create Project
-                    </button>
+                    {user?.id === organizationData.owner?.id &&
+                        <button
+                            onClick={() => navigate(`/organization/${organizationData.id}/projects/create`)}
+                            className='flex items-center gap-2 bg-accent px-2 mb-4 py-2 rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:cursor-pointer'
+                        >
+                            <FiPlusCircle className='h-5 w-5' />
+                            Create Project
+                        </button>
+                    }
                 </div>
                 <DataTable
                     data={projectData}
@@ -174,7 +183,7 @@ export const SingleOrganizationView = () => {
             {user?.id === organizationData.owner?.id && (
                 <div className='flex w-full flex-wrap  gap-3 pb-4 justify-end'>
                     <button
-                        onClick={() => navigate(`/organization/${organizationData.id}/invite`)}
+                        onClick={() => setInvitingShown(true)}
                         className='flex items-center gap-2 bg-accent px-4 py-2 rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:cursor-pointer'
                     >
                         <FiUserPlus className='h-5 w-5' />

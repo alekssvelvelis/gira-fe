@@ -24,6 +24,8 @@ import { ProjectCreateView } from '@/views/management/projects/ProjectCreateView
 import { ProjectEditView } from '@/views/management/projects/ProjectEditView';
 import { SingleProjectView } from '@/views/management/projects/SingleProjectView';
 
+import { AcceptInvitationView } from '@/views/AcceptInviationView';
+
 import ProtectedRoute from '@/components/authentication/ProtectedRoute';
 import { SidebarLayout } from '@/components/layouts/SidebarLayout';
 
@@ -37,6 +39,7 @@ export default function App() {
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<LoginView />} />
           <Route path="/register" element={<RegisterView />} />
+          <Route path="/invitations/:token" element={<AcceptInvitationView />} />
           <Route element={
             <ProtectedRoute>
               <SidebarLayout />
@@ -61,6 +64,7 @@ export default function App() {
             <Route path="/organization/:orgId/project/:projId/tasks/:taskId" element={<TaskView />} />
             <Route path="/organization/:orgId/project/:projId/tasks/:taskId/edit" element={<TaskEditView />} />
             <Route path="/organization/:orgId/project/:projId/tasks/create" element={<TaskCreateView />} />
+
            </Route>
         </Routes>
       </BrowserRouter>

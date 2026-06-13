@@ -7,15 +7,32 @@ import { BACKEND_URL } from '@/utils/axios';
 export const OrganizationsView = () => {
     const navigate = useNavigate();
     const [userOrganizations, setUserOrganizations] = useState<Organization[]>([]);
-
+    const [isLoading, setIsLoading] = useState(true);
     useEffect(() => {
         const fetchOrganizations = async () => {
+            try {
+                setIsLoading(true);
+                const data = await organizationsGetRequest();
+                setUserOrganizations(data);
+            } catch (error) {
+                console.error("Failed to fetch user organiaztions:", error);
+            } finally {
+                setIsLoading(false);
+            }
             const data = await organizationsGetRequest();
             setUserOrganizations(data);
         };
 
         fetchOrganizations();
     },[]);
+
+    if (isLoading) {
+        return (
+            <div className='min-h-full flex items-center justify-center bg-darkened-surface'>
+                <h1 className='text-3xl text-white'>Loading...</h1>
+            </div>
+        );
+    }
 
     return (
         <div className='relative min-h-full flex flex-col max-h-full overflow-y-scroll bg-darkened-surface p-4 md:p-6'>

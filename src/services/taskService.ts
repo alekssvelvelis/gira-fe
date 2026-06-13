@@ -55,5 +55,6 @@ export const tasksGetRequest = async (organizationId: number, projectId: number)
 
 export const specificTaskGetRequest = async (organizationId: number, projectId: number, taskId: number) => {
     const response = await api.get(`/organizations/${organizationId}/projects/${projectId}/tasks/${taskId}`);
+    console.log(response);
     return response.data;
 };

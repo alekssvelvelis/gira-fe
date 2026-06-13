@@ -6,7 +6,7 @@ import { FiEdit2 } from 'react-icons/fi';
 
 import { formatDateDayMonthYear } from '@/utils/dateUtils';
 import { specificTaskGetRequest } from '@/services/taskService';
-
+import { BACKEND_URL } from '@/utils/axios';
 import type { Task } from '@/constants/dummy-data';
 export const TaskView = () => {
     const navigate = useNavigate();
@@ -14,14 +14,14 @@ export const TaskView = () => {
 
     const [singleTask, setSingleTask] = useState<Task>();
     const [isLoading, setIsLoading] = useState(true);
-
+    const [isOwner, setIsOwner] = useState();
     useEffect(() => {
         const fetchSingleTask = async (organizationId: number, projectId: number, taskId: number) => {
             try {
                 setIsLoading(true);   
                 const response = await specificTaskGetRequest(organizationId,  projectId, taskId);
-                console.log(response);
-                setSingleTask(response);
+                setSingleTask(response.task);
+                setIsOwner(response.is_owner);
             } catch (error) {
                 console.error("Failed to fetch single project:", error);
             } finally {
@@ -33,7 +33,7 @@ export const TaskView = () => {
             fetchSingleTask(Number(orgId), Number(projId), Number(taskId));
         }
     },[orgId, projId, taskId]);
-    console.log(singleTask);
+    
     if (isLoading) {
         return (
             <div className='min-h-full flex items-center justify-center bg-darkened-surface'>
@@ -62,8 +62,8 @@ export const TaskView = () => {
                         <GoArrowLeft className='h-6 w-6 flex-shrink-0 transition-all duration-300 hover:scale-110 hover:cursor-pointer' />
                     </button>
                     <div>
-                        <p className='text-lg  mb-0.5'>Project {projId}</p>
-                        <p className='text-xl font-medium font-mono'>{singleTask.id}</p>
+                        <p className='text-lg  mb-0.5'>Project: {singleTask.project?.project_name}</p>
+                        <p className='text-xl font-medium font-mono'>Project ID: {singleTask.project_id}</p>
                     </div>
                 </div>
                 <span className={`text-lg font-medium px-2.5 py-1 rounded-full ring-1 ring-inset ${badgeClass}`}>
@@ -77,9 +77,9 @@ export const TaskView = () => {
                     <p>Assigned To: </p>
                     <img 
                     className='rounded-full w-6 h-6 mx-2'
-                    src='https://static.vecteezy.com/system/resources/thumbnails/008/442/086/small/illustration-of-human-icon-user-symbol-icon-modern-design-on-blank-background-free-vector.jpg'
+                    src={`${BACKEND_URL}/storage/${singleTask.assignee?.profile_picture}` || `https://www.shutterstock.com/image-vector/man-silhouette-icon-question-mark-260nw-192704537.jpg`}
                     /> 
-                    <p>{singleTask.assignee_id}</p>
+                    <p>{singleTask.assignee?.nickname}</p>
                 </div>
             </div>
             <p className='text-xl leading-relaxed mb-6'>
@@ -100,14 +100,17 @@ export const TaskView = () => {
                 </p>
             </div>
         </div>
-
-            <button
-                onClick={() => navigate(`/organization/${orgId}/project/${projId}/tasks/${singleTask.id}/edit`)}
-                className='absolute bottom-5 right-5 flex items-center gap-1.5 bg-accent p-2 rounded-lg items-center duration-300 transition-all hover:cursor-pointer hover:bg-primary'
-            >
-                <FiEdit2 className='h-6 w-6' />
-                Edit task
-            </button>
+            {isOwner &&
+            <>
+                <button
+                    onClick={() => navigate(`/organization/${orgId}/project/${projId}/tasks/${singleTask.id}/edit`)}
+                    className='absolute bottom-5 right-5 flex items-center gap-1.5 bg-accent p-2 rounded-lg items-center duration-300 transition-all hover:cursor-pointer hover:bg-primary'
+                >
+                    <FiEdit2 className='h-6 w-6' />
+                    Edit task
+                </button>
+            </>
+            }
 
         </div>
     );

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { FormField } from '@/components/input/FormField';
 
@@ -19,6 +19,7 @@ export const LoginView = () => {
 
     const { login } = useAuth();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
 
     const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -45,11 +46,12 @@ export const LoginView = () => {
 
         if (newErrors.loginEmailError || newErrors.loginPasswordError) return;
         try {  
-            console.log(1);
             await login(email, password);
-            navigate('/dashboard');
+            const redirect = localStorage.getItem('redirect_after_login');
+            console.log('GET:', localStorage.getItem('redirect_after_login'));
+            localStorage.removeItem('redirect_after_login');
+            navigate(redirect || '/dashboard');
         } catch (error: any) {
-            console.log(2);
             if (error.response?.status >= 400) {
                 const laravelErrors = error.response.data;
                 console.log(laravelErrors);

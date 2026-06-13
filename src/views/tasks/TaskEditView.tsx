@@ -40,7 +40,7 @@ export const TaskEditView = () => {
             try {
                 setIsLoading(true);   
                 const response = await specificTaskGetRequest(organizationId,  projectId, taskId);
-                setSingleTask(response);
+                setSingleTask(response.task);
             } catch (error) {
                 console.error("Failed to fetch single project:", error);
             } finally {
@@ -131,7 +131,6 @@ export const TaskEditView = () => {
         if (Object.values(newErrors).some(e => e !== '')) return;
 
         try {
-            console.log(singleTask, 'edited');
             await taskEditRequest(
                 Number(orgId), 
                 Number(projId), 
@@ -161,7 +160,6 @@ export const TaskEditView = () => {
         }
         console.log('Task edited successfully');
     }
-    
     return (
         <div className='relative min-h-full max-h-full overflow-y-scroll bg-darkened-surface p-4 md:p-6'>
             <div className='flex items-center justify-between pb-3 border-b border-border mb-5'>
@@ -184,7 +182,7 @@ export const TaskEditView = () => {
                         <FormField
                             name='task-edit-description-input'
                             label='Task Description:'
-                            value={singleTask.task_description || ''}
+                            value={singleTask.task_description}
                             onChange={handleFieldChange('task_description')}
                             config={{type: 'textarea', rows: 4}}
                             placeholder='Enter task description...'
@@ -219,7 +217,7 @@ export const TaskEditView = () => {
                         <FormField
                             name="task-priority-input"
                             label="Priority"
-                            value={singleTask.priority.toString()}
+                            value={String(singleTask.priority)}
                             onChange={handleFieldChange('priority')}
                             config={{ type: 'select', options: PRIORITIES.map(prio => ({
                                 label: prio.label,

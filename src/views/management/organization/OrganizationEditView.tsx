@@ -148,7 +148,7 @@ export const SingleOrganizationEditView = () => {
             <div className='flex items-center justify-between pb-3 border-b border-border mb-5'>
                 <div className='flex items-center gap-3'>
                     <button
-                        onClick={() => navigate(-1)}
+                        onClick={() => navigate(`/organization/${orgId}`)}
                         className='flex items-center justify-center'
                         aria-label='Go back'
                     >

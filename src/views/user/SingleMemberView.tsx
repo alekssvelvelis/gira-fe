@@ -5,31 +5,58 @@ import type{ Organization, User } from '@/constants/dummy-data';
 import { FiEdit2 } from "react-icons/fi";
 import { GoArrowLeft } from "react-icons/go";
 import { useNavigate, useParams } from "react-router-dom";
-import { getSpecificUser, getSpecificUserOrganizations } from '@/services/userService';
+import { getSpecificUser, getSpecificUserOrganizations, getSelf } from '@/services/userService';
 import { BACKEND_URL } from '@/utils/axios';
 import { formatDateDayMonthYear } from '@/utils/dateUtils';
-
+import { useAuth } from '@/hooks/useAuth';
 export const SingleMemberView = () => {
     const navigate = useNavigate();
     const { userId } = useParams<{userId: string}>()
+    const { user } = useAuth();
     const [userData, setUserData] = useState<User>();
     const [userOrganizations, setUserOrganizations] = useState<Organization[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchUser = async(userId: number) => {
-            const response = await getSpecificUser(userId);
-            setUserData(response);
+            try {
+                setIsLoading(true);
+                let response;
+                if (Number(userId) === user?.id){
+                    response = await getSelf(userId);
+                } else {
+                    response = await getSpecificUser(userId);
+                }
+                setUserData(response);
+            } catch (error) {
+                console.error("Failed to fetch user data:", error);
+            } finally {
+                setIsLoading(false);
+            }
         }
 
         const fetchUserOrganizations = async() => {
-            const response = await getSpecificUserOrganizations();
-            setUserOrganizations(response);
+            try {
+                const response = await getSpecificUserOrganizations();
+                setUserOrganizations(response);
+            } catch (error) {
+                console.error("Failed to fetch user organiaztions:", error);
+            } finally {
+                setIsLoading(false);
+            }
         }
         
         fetchUser(Number(userId));
         fetchUserOrganizations();
     },[userId])
-    console.log(userData);
+    
+    if (isLoading) {
+        return (
+            <div className='min-h-full flex items-center justify-center bg-darkened-surface'>
+                <h1 className='text-3xl text-white'>Loading...</h1>
+            </div>
+        );
+    }
     return(
         <div className='relative min-h-full flex flex-col max-h-full overflow-y-scroll bg-darkened-surface p-4 md:p-6'>
         
@@ -84,7 +111,7 @@ export const SingleMemberView = () => {
                                     </div>
                                     <div>
                                         <p className='text-xs text-accent mb-1'>Role</p>
-                                        <p className='font-mono text-sm'>Role name</p>
+                                        <p className='font-mono text-sm capitalize'>{org.pivot?.role}</p>
                                     </div>
 
                                 </div>
@@ -92,14 +119,16 @@ export const SingleMemberView = () => {
                             ))}
                         </div>
                     </div>
-        
-                    <button
-                        // onClick={() => navigate(`/member/${singleMember[0].user_id}/edit`)}
-                        className='absolute bottom-5 right-5 flex items-center gap-1.5 bg-accent p-2 rounded-lg items-center duration-300 transition-all hover:cursor-pointer hover:bg-primary'
-                    >
-                        <FiEdit2 className='h-6 w-6' />
-                        Edit User
-                    </button>
+                    
+                    {Number(userId) === user?.id &&
+                        <button
+                            onClick={() => navigate(`/member/${userData?.id}/edit`)}
+                            className='absolute bottom-5 right-5 flex items-center gap-1.5 bg-accent p-2 rounded-lg items-center duration-300 transition-all hover:cursor-pointer hover:bg-primary'
+                        >
+                            <FiEdit2 className='h-6 w-6' />
+                            Edit User
+                        </button>
+                    }
                 </div>
     );
 }

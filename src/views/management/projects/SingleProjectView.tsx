@@ -13,19 +13,24 @@ import type { ColumnDef } from '@/components/output/DataTable';
 import type { Task } from '@/constants/dummy-data';
 import { getSpecificProjectRequest } from '@/services/projectService';
 import { tasksGetRequest } from '@/services/taskService';
+import { useAuth } from '@/hooks/useAuth';
+import { BACKEND_URL } from '@/utils/axios';
 export const SingleProjectView = () => {
     const navigate = useNavigate();
     const { orgId, projId } = useParams<{ orgId: string; projId: string }>();
+    const { user } = useAuth();
     
     const [singleProjectData, setSingleProjectData] = useState<Project>();
     const [singleProjectTasks, setSingleProjectTasks] = useState<Task[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isOwner, setIsOwner] = useState();
     useEffect(() => {
         const fetchSingleProject = async (organizationId: number, projectId: number) => {
             try {
                 setIsLoading(true);   
                 const response = await getSpecificProjectRequest(organizationId, projectId);
-                setSingleProjectData(response);
+                setSingleProjectData(response.project);
+                setIsOwner(response.is_owner);
             } catch (error) {
                 console.error("Failed to fetch single project:", error);
             } finally {
@@ -49,7 +54,7 @@ export const SingleProjectView = () => {
             fetchProjectTasks(Number(orgId), Number(projId));
         }
     },[orgId, projId]);
-    
+    console.log(singleProjectTasks);
     if (isLoading) {
         return (
             <div className='min-h-full flex items-center justify-center bg-darkened-surface'>
@@ -97,9 +102,9 @@ export const SingleProjectView = () => {
                 <div className={`flex items-center gap-2`}>
                     <img 
                     className='w-4 h-4 object-fit rounded-full'
-                    src='https://www.shutterstock.com/image-vector/man-silhouette-icon-question-mark-260nw-192704537.jpg'
+                    src={`${BACKEND_URL}/storage/${task.assignee?.profile_picture}` || `https://www.shutterstock.com/image-vector/man-silhouette-icon-question-mark-260nw-192704537.jpg`}
                     />
-                    {task.assignee_id}
+                    {task.assignee?.nickname}
                 </div>
             ),
         },
@@ -158,7 +163,8 @@ export const SingleProjectView = () => {
             </div>
 
             <div className='flex w-full flex-wrap gap-3 pb-4 justify-end'>
-
+            {isOwner &&
+            <>
                 <button
                     onClick={() => navigate(`/organization/${orgId}/project/${singleProjectData?.id}/edit`)}
                     className='flex items-center gap-2 bg-accent px-4 py-2 rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:cursor-pointer'
@@ -173,6 +179,8 @@ export const SingleProjectView = () => {
                     <FiPlusCircle className='h-5 w-5' />
                     New Task
                 </button>
+            </>
+            }
             </div>
             
         </div>
