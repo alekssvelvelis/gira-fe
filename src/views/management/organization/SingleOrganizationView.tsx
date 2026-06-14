@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { GoArrowLeft } from 'react-icons/go';
-import { FiEdit2, FiUserPlus, FiUsers, FiPlusCircle } from 'react-icons/fi';
+import { FiEdit2, FiUserPlus, FiUsers, FiPlusCircle, FiXCircle } from 'react-icons/fi';
 
-import { getSpecificOrganizationRequest } from '@/services/organizationService';
+import { deleteSpecificOrganization, getSpecificOrganizationRequest } from '@/services/organizationService';
 import { projectsGetRequest } from '@/services/projectService'; 
 
 import type { Organization, Project } from '@/constants/dummy-data';
@@ -15,6 +15,7 @@ import { BACKEND_URL } from '@/utils/axios';
 import { useAuth } from '@/hooks/useAuth';
 
 import { InviteMember } from '@/components/input/InviteMember';
+import { ConfirmModal } from '@/components/input/ConfirmDelete';
 
 export const SingleOrganizationView = () => {
     const navigate = useNavigate();
@@ -25,7 +26,7 @@ export const SingleOrganizationView = () => {
     const [projectData, setProjectData] = useState<Project[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [isInvitingShown, setInvitingShown] = useState<boolean>(false);
-
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     useEffect(() => {
         const fetchSingleOrganization = async (organizationId: number) => {
             try {
@@ -197,12 +198,33 @@ export const SingleOrganizationView = () => {
                         View Members
                     </button>
                     <button
+                        onClick={() => setIsModalOpen(true)}
+                        className='flex items-center gap-2 bg-accent px-4 py-2 rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:cursor-pointer'
+                    >
+                        <FiXCircle className='h-5 w-5' />
+                        Delete Organization
+                    </button>
+                    <button
                         onClick={() => navigate(`/organization/${organizationData.id}/edit`)}
                         className='flex items-center gap-2 bg-accent px-4 py-2 rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:cursor-pointer'
                     >
                         <FiEdit2 className='h-5 w-5' />
                         Edit Organization
                     </button>
+                    {isModalOpen && 
+                    <>
+                        <ConfirmModal
+                            isOpen={isModalOpen}
+                            title="Delete organization?"
+                            description={`Organization ${organizationData.organization_name} with ID: "${organizationData.id}" will be permanently removed.`}
+                            onConfirm={() => {
+                                deleteSpecificOrganization(Number(orgId));
+                                navigate(`/organizations`);
+                            }}
+                            onClose={() => setIsModalOpen(false)}
+                        />
+                    </>
+                    }
                 </div>
             )}
         </div>

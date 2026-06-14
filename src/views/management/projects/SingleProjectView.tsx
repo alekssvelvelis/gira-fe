@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { GoArrowLeft } from 'react-icons/go';
-import { FiEdit2 } from 'react-icons/fi';
+import { FiEdit2, FiXCircle } from 'react-icons/fi';
 import { FiPlusCircle } from 'react-icons/fi';
 
 import { TASK_TYPE_CLASSES } from '@/constants/dummy-data';
@@ -11,10 +11,11 @@ import { DataTable } from '@/components/output/DataTable';
 
 import type { ColumnDef } from '@/components/output/DataTable';
 import type { Task } from '@/constants/dummy-data';
-import { getSpecificProjectRequest } from '@/services/projectService';
+import { deleteSpecificProject, getSpecificProjectRequest } from '@/services/projectService';
 import { tasksGetRequest } from '@/services/taskService';
 import { useAuth } from '@/hooks/useAuth';
 import { BACKEND_URL } from '@/utils/axios';
+import { ConfirmModal } from '@/components/input/ConfirmDelete';
 export const SingleProjectView = () => {
     const navigate = useNavigate();
     const { orgId, projId } = useParams<{ orgId: string; projId: string }>();
@@ -24,6 +25,7 @@ export const SingleProjectView = () => {
     const [singleProjectTasks, setSingleProjectTasks] = useState<Task[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isOwner, setIsOwner] = useState();
+    const [isModalOpen, setIsModalOpen] = useState(false);
     useEffect(() => {
         const fetchSingleProject = async (organizationId: number, projectId: number) => {
             try {
@@ -54,7 +56,7 @@ export const SingleProjectView = () => {
             fetchProjectTasks(Number(orgId), Number(projId));
         }
     },[orgId, projId]);
-    console.log(singleProjectTasks);
+
     if (isLoading) {
         return (
             <div className='min-h-full flex items-center justify-center bg-darkened-surface'>
@@ -166,6 +168,13 @@ export const SingleProjectView = () => {
             {isOwner &&
             <>
                 <button
+                    onClick={() => setIsModalOpen(true)}
+                    className='flex items-center gap-2 bg-accent px-4 py-2 rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:cursor-pointer'
+                >
+                    <FiXCircle className='h-5 w-5' />
+                    Delete Project
+                </button>
+                <button
                     onClick={() => navigate(`/organization/${orgId}/project/${singleProjectData?.id}/edit`)}
                     className='flex items-center gap-2 bg-accent px-4 py-2 rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:cursor-pointer'
                 >
@@ -179,6 +188,18 @@ export const SingleProjectView = () => {
                     <FiPlusCircle className='h-5 w-5' />
                     New Task
                 </button>
+                {isModalOpen && 
+                    <ConfirmModal
+                    isOpen={isModalOpen}
+                    title="Delete project?"
+                    description={`Project ${singleProjectData.project_name} with ID: "${singleProjectData.id}" will be permanently removed.`}
+                    onConfirm={() => {
+                        deleteSpecificProject(Number(orgId), Number(projId));
+                        navigate(`/organization/${orgId}`);
+                    }}
+                    onClose={() => setIsModalOpen(false)}
+                    />
+                }
             </>
             }
             </div>

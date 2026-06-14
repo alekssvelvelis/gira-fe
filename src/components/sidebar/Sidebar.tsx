@@ -88,7 +88,7 @@ export const Sidebar = () => {
                         className='w-full h-10 flex items-center text-sidebar-text justify-between px-2 duration-300 transition-all hover:cursor-pointer hover:bg-secondary'
                         href={`/member/${user?.id}`}
                     >
-                        <h1 className='text-xl font-light'>Alekss Velvelis</h1>
+                        <h1 className='text-xl font-light'>{user?.nickname}</h1>
                         <IoCogOutline className='h-6 w-6 flex-shrink-0 transition-all duration-300 hover:scale-110 hover:cursor-pointer' />
                     </a>
                     <hr />

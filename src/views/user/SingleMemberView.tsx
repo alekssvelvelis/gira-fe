@@ -2,20 +2,23 @@ import { useState, useEffect } from 'react';
 
 import type{ Organization, User } from '@/constants/dummy-data';
 
-import { FiEdit2 } from "react-icons/fi";
+import { FiEdit2, FiXCircle } from "react-icons/fi";
 import { GoArrowLeft } from "react-icons/go";
 import { useNavigate, useParams } from "react-router-dom";
-import { getSpecificUser, getSpecificUserOrganizations, getSelf } from '@/services/userService';
+import { getSpecificUser, getSpecificUserOrganizations, getSelf, deleteSpecificUser } from '@/services/userService';
 import { BACKEND_URL } from '@/utils/axios';
 import { formatDateDayMonthYear } from '@/utils/dateUtils';
 import { useAuth } from '@/hooks/useAuth';
+import { ConfirmModal } from '@/components/input/ConfirmDelete';
+
 export const SingleMemberView = () => {
     const navigate = useNavigate();
     const { userId } = useParams<{userId: string}>()
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
     const [userData, setUserData] = useState<User>();
     const [userOrganizations, setUserOrganizations] = useState<Organization[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         const fetchUser = async(userId: number) => {
@@ -35,9 +38,9 @@ export const SingleMemberView = () => {
             }
         }
 
-        const fetchUserOrganizations = async() => {
+        const fetchUserOrganizations = async(userId: number) => {
             try {
-                const response = await getSpecificUserOrganizations();
+                const response = await getSpecificUserOrganizations(userId);
                 setUserOrganizations(response);
             } catch (error) {
                 console.error("Failed to fetch user organiaztions:", error);
@@ -47,7 +50,7 @@ export const SingleMemberView = () => {
         }
         
         fetchUser(Number(userId));
-        fetchUserOrganizations();
+        fetchUserOrganizations(Number(userId));
     },[userId])
     
     if (isLoading) {
@@ -57,6 +60,8 @@ export const SingleMemberView = () => {
             </div>
         );
     }
+    console.log(userData);
+    console.log(userOrganizations);
     return(
         <div className='relative min-h-full flex flex-col max-h-full overflow-y-scroll bg-darkened-surface p-4 md:p-6'>
         
@@ -90,9 +95,11 @@ export const SingleMemberView = () => {
                                 alt={`${userData?.nickname} profile picture`}
                                 className='w-80 h-64 object-cover rounded-lg border border-accent'
                             />
+                            <h1 className='text-center'>{userData?.nickname} profile picture</h1>
                         </div>
         
                         <div className='flex flex-col gap-6 flex-1'>
+                            <h1 className='text-2xl'>User is in Organizations:</h1>
                             {userOrganizations.map(org => (
                             <>
                                 <div>
@@ -100,7 +107,7 @@ export const SingleMemberView = () => {
                                     <p className='text-lg leading-relaxed'>{org.organization_description}</p>
                                 </div>
             
-                                <div className='grid grid-cols-3 gap-4 pt-4 border-t'>
+                                <div className='grid grid-cols-3 gap-4 pt-4 border-t border-b'>
                                     <div>
                                         <p className='text-xs text-accent mb-1'>Organization ID</p>
                                         <p className='font-mono text-sm'>{org.id}</p>
@@ -119,16 +126,40 @@ export const SingleMemberView = () => {
                             ))}
                         </div>
                     </div>
-                    
+
+                    <div className='flex w-full flex-wrap gap-3 pb-4 justify-end'>
                     {Number(userId) === user?.id &&
+                    <>
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            className='flex items-center gap-1.5 bg-accent p-2 rounded-lg items-center duration-300 transition-all hover:cursor-pointer hover:bg-primary'
+                        >
+                            <FiXCircle className='h-6 w-6' />
+                            Delete User
+                        </button>
                         <button
                             onClick={() => navigate(`/member/${userData?.id}/edit`)}
-                            className='absolute bottom-5 right-5 flex items-center gap-1.5 bg-accent p-2 rounded-lg items-center duration-300 transition-all hover:cursor-pointer hover:bg-primary'
+                            className='flex items-center gap-1.5 bg-accent p-2 rounded-lg items-center duration-300 transition-all hover:cursor-pointer hover:bg-primary'
                         >
                             <FiEdit2 className='h-6 w-6' />
                             Edit User
                         </button>
+                        {isModalOpen && 
+                            <ConfirmModal
+                                isOpen={isModalOpen}
+                                title="Delete user?"
+                                description={`User ${userData?.nickname} with ID ${userData?.id} will be permanently removed.`}
+                                onConfirm={() => {
+                                    deleteSpecificUser(Number(user.id));
+                                    logout();
+                                    navigate(`/`);
+                                }}
+                                onClose={() => setIsModalOpen(false)}
+                            />
+                        }
+                    </> 
                     }
+                    </div>
                 </div>
     );
 }

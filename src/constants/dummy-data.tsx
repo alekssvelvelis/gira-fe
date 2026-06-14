@@ -19,7 +19,8 @@ export interface Task {
   due_date: string;
   project?: {
     id: number,
-    project_name: string;
+    project_name: string,
+    organization_id: number,
   };
   assignee?: {
     id: number,

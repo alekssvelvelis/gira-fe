@@ -28,7 +28,7 @@ export const ProjectEditView = () => {
             try {
                 setIsLoading(true);   
                 const response = await getSpecificProjectRequest(organizationId, projectId);
-                setSingleProjectData(response);
+                setSingleProjectData(response.project);
             } catch (error) {
                 console.error("Failed to fetch single project:", error);
             } finally {
@@ -49,7 +49,7 @@ export const ProjectEditView = () => {
             };
         });
     };
-
+    console.log(singleProjectData);
     if (isLoading) {
         return (
             <div className='min-h-full flex items-center justify-center bg-darkened-surface'>
@@ -117,8 +117,8 @@ export const ProjectEditView = () => {
                         <GoArrowLeft className='h-6 w-6 flex-shrink-0 transition-all duration-300 hover:scale-110 hover:cursor-pointer' />
                     </button>
                     <div>
-                        <p className='text-lg mb-0.5'>Editing project</p>
-                        <p className='text-xl font-medium font-mono'>{singleProjectData?.id}</p>
+                        <p className='text-lg mb-0.5'>Editing project: {singleProjectData?.project_name}</p>
+                        <p className='text-xl font-medium font-mono'>Project ID: {singleProjectData?.id}</p>
                     </div>
                 </div>
             </div>

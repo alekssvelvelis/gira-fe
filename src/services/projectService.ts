@@ -42,3 +42,9 @@ export const getSpecificProjectRequest = async (organizationId: number, projectI
     const response = await api.get(`/organizations/${organizationId}/projects/${projectId}`);
     return response.data;
 };
+
+export const deleteSpecificProject = async (organizationId: number, projectId: number) => {
+    const response = await api.delete(`/organizations/${organizationId}/projects/${projectId}`);
+    console.log(response);
+    return response;
+}

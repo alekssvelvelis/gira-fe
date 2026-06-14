@@ -16,14 +16,16 @@ export const userEditRequest = async (
     
     if (newPassword && newConfirmedPassword) {
         formData.append('new_password', newPassword);
-        formData.append('new_confirmed_password', newConfirmedPassword);
+        formData.append('confirmed_new_password', newConfirmedPassword);
     }
     if (profilePicture) {
         formData.append('profile_picture', profilePicture)
     }
 
     formData.append('_method', 'PUT');
-
+    formData.forEach((value, key) => {
+    console.log(`${key}:`, value);
+});
     const response = await api.post(`/users/${userId}/edit`, formData);
 
     const { message } = response.data;
@@ -41,7 +43,13 @@ export const getSpecificUser = async (userId: number) => {
     return response.data;
 }
 
-export const getSpecificUserOrganizations = async () => {
-    const response = await api.get(`/userOrganizations`);
+export const getSpecificUserOrganizations = async (userId: number) => {
+    const response = await api.get(`/users/${userId}/organizations`);
+    console.log(response);
     return response.data;
+}
+
+export const deleteSpecificUser = async (userId: number) => {
+    const response = await api.delete(`/users/${userId}`);
+    console.log(response);
 }

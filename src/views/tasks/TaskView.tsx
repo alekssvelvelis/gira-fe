@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react';
 import { TASK_TYPE_CLASSES } from '@/constants/dummy-data';
 import { useNavigate, useParams } from 'react-router-dom';
 import { GoArrowLeft } from 'react-icons/go';
-import { FiEdit2 } from 'react-icons/fi';
-
+import { FiEdit2, FiXCircle } from 'react-icons/fi';
+import { ConfirmModal } from '@/components/input/ConfirmDelete';
 import { formatDateDayMonthYear } from '@/utils/dateUtils';
-import { specificTaskGetRequest } from '@/services/taskService';
+import { specificTaskGetRequest, deleteSpecificTask } from '@/services/taskService';
 import { BACKEND_URL } from '@/utils/axios';
 import type { Task } from '@/constants/dummy-data';
 export const TaskView = () => {
@@ -15,6 +15,7 @@ export const TaskView = () => {
     const [singleTask, setSingleTask] = useState<Task>();
     const [isLoading, setIsLoading] = useState(true);
     const [isOwner, setIsOwner] = useState();
+    const [isModalOpen, setIsModalOpen] = useState(false);
     useEffect(() => {
         const fetchSingleTask = async (organizationId: number, projectId: number, taskId: number) => {
             try {
@@ -63,7 +64,7 @@ export const TaskView = () => {
                     </button>
                     <div>
                         <p className='text-lg  mb-0.5'>Project: {singleTask.project?.project_name}</p>
-                        <p className='text-xl font-medium font-mono'>Project ID: {singleTask.project_id}</p>
+                        <p className='text-xl font-medium font-mono'>Project ID:{singleTask.project_id}</p>
                     </div>
                 </div>
                 <span className={`text-lg font-medium px-2.5 py-1 rounded-full ring-1 ring-inset ${badgeClass}`}>
@@ -109,6 +110,25 @@ export const TaskView = () => {
                     <FiEdit2 className='h-6 w-6' />
                     Edit task
                 </button>
+                <button
+                    onClick={() => setIsModalOpen(true)}
+                    className='absolute bottom-5 right-40 flex items-center gap-1.5 bg-accent p-2 rounded-lg items-center duration-300 transition-all hover:cursor-pointer hover:bg-primary'
+                >
+                    <FiXCircle className='h-6 w-6' />
+                    Delete task
+                </button>
+                {isModalOpen && 
+                    <ConfirmModal
+                    isOpen={isModalOpen}
+                    title="Delete task?"
+                    description={`Task with ID: "${singleTask.id}" will be permanently removed.`}
+                    onConfirm={() => {
+                        deleteSpecificTask(Number(orgId), Number(projId), Number(taskId));
+                        navigate(`/organization/${orgId}/project/${projId}`);
+                    }}
+                    onClose={() => setIsModalOpen(false)}
+                    />
+                }
             </>
             }
 

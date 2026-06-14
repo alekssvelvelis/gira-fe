@@ -57,3 +57,9 @@ export const getOrganizationMembers = async (organizationId: number) => {
     const response = await api.get(`/organizations/${organizationId}/users`);
     return response.data;
 }
+
+export const deleteSpecificOrganization = async (organizationId: number) => {
+    const response = await api.delete(`/organizations/${organizationId}`);
+    console.log(response);
+    return response;
+}

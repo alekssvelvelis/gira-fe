@@ -4,7 +4,6 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { LoginView } from '@/views/authentication/LoginView';
 import { RegisterView } from '@/views/authentication/RegisterView';
 import { Dashboard } from '@/views/main/Dashboard';
-import { Calendar } from '@/views/main/Calendar';
 
 import { TaskView } from '@/views/tasks/TaskView';
 import { TaskEditView } from '@/views/tasks/TaskEditView';
@@ -46,7 +45,6 @@ export default function App() {
             </ProtectedRoute>
           }>
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/calendar" element={<Calendar />} />
             <Route path="/member/:userId" element={<SingleMemberView />} />
             <Route path="/member/:userId/edit" element={<UserEditView />} />
 

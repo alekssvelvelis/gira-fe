@@ -48,7 +48,6 @@ export const LoginView = () => {
         try {  
             await login(email, password);
             const redirect = localStorage.getItem('redirect_after_login');
-            console.log('GET:', localStorage.getItem('redirect_after_login'));
             localStorage.removeItem('redirect_after_login');
             navigate(redirect || '/dashboard');
         } catch (error: any) {

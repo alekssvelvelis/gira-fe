@@ -53,8 +53,19 @@ export const tasksGetRequest = async (organizationId: number, projectId: number)
     return response.data;
 };
 
+export const userTasksGetRequest = async (userId: number) => {
+    const response = await api.get(`/users/${userId}/tasks`);
+    console.log(response);
+    return response.data;
+}
+
 export const specificTaskGetRequest = async (organizationId: number, projectId: number, taskId: number) => {
     const response = await api.get(`/organizations/${organizationId}/projects/${projectId}/tasks/${taskId}`);
     console.log(response);
     return response.data;
 };
+
+export const deleteSpecificTask = async(organizationId: number, projectId: number, taskId: number) => {
+    const response = await api.delete(`/organizations/${organizationId}/projects/${projectId}/tasks/${taskId}`);
+    console.log(response);
+}

@@ -79,7 +79,7 @@ export const ProjectCreateView = () => {
                 className='flex flex-col w-full gap-6'
                 onSubmit={handleSubmit}
             >
-                <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
+                <div className='grid grid-cols-1 gap-4'>
                     <FormField
                         name='project-create-name'
                         label='Project name'
