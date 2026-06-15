@@ -120,7 +120,7 @@ export const UserEditView = () => {
             await userEditRequest(
                 Number(userId), 
                 userData?.email, 
-                userData?.nickname,
+                userData?.nickname || '',
                 userCurrentPassword,
                 userNewPassword ? userNewPassword : null,
                 userConfirmedNewPassword ? userConfirmedNewPassword : null,

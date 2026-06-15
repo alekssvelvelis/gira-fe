@@ -41,7 +41,7 @@ export const ProjectCreateView = () => {
         if (Object.values(newErrors).some(e => e !== '')) return;
         try {
             await projectCreateRequest(projectName, projectDescription, Number(orgId));
-            navigate(-1);
+            navigate(`/organization/${orgId}`);
         } catch (error: any) {
             if (error.response?.status === 422) {
                 const laravelErrors = error.response.data.errors;
@@ -61,7 +61,7 @@ export const ProjectCreateView = () => {
             <div className='flex items-center justify-between pb-3 border-b border-border mb-5'>
                 <div className='flex items-center gap-3'>
                     <button
-                        onClick={() => navigate(-1)}
+                        onClick={() => navigate(`/organization/${orgId}`)}
                         className='flex items-center justify-center'
                         aria-label='Go back'
                     >
@@ -69,7 +69,7 @@ export const ProjectCreateView = () => {
                     </button>
                     <div>
                         <p className='text-lg mb-0.5'>Creating new project</p>
-                        <p className='text-xl font-medium'>{orgId}</p>
+                        <p className='text-xl font-medium'>For organization with ID: {orgId}</p>
                     </div>
                 </div>
             </div>

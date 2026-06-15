@@ -116,7 +116,6 @@ export const SingleProjectView = () => {
             render: (task) => new Date(task.due_date).toLocaleDateString(),
         },
     ];
-
     return (
         <div className='relative min-h-full flex flex-col max-h-full overflow-y-scroll bg-darkened-surface p-4 md:p-6'>
 
@@ -155,12 +154,19 @@ export const SingleProjectView = () => {
 
                 <div className='pt-4 border-t'></div>
                 <div className='overflow-hidden overflow-x-scroll'>
+                    {singleProjectTasks.length === 0 &&
+                    <h1 className='text-2xl'>You have no projects, create one!</h1>
+                    }
+                    {singleProjectTasks.length >= 1 &&
+                    <>
                     <DataTable
                         data={singleProjectTasks}
                         columns={taskColumns}
                         getRowKey={(task) => task.id}
                         onRowClick={(task) => navigate(`/organization/${orgId}/project/${projId}/tasks/${task.id}`)}
                     />
+                    </>
+                    }
                 </div>
             </div>
 

@@ -99,7 +99,7 @@ export const SingleOrganizationView = () => {
         <div className='relative min-h-full flex flex-col max-h-full overflow-y-scroll bg-darkened-surface p-4 md:p-6'>
             {isInvitingShown && (
                 <InviteMember
-                    organizationId={orgId}
+                    organizationId={orgId ? orgId : '1'}
                     onClose={() => setInvitingShown(false)}
                 />
             )}
@@ -173,12 +173,19 @@ export const SingleOrganizationView = () => {
                         </button>
                     }
                 </div>
-                <DataTable
-                    data={projectData}
-                    columns={projectColumns}
-                    getRowKey={(project) => project.id}
-                    onRowClick={(project) => navigate(`/organization/${orgId}/project/${project.id}`)}
-                />
+                {projectData.length === 0 &&
+                <h1 className='text-2xl'>You have no projects, create one!</h1>
+                }
+                {projectData.length >= 1 &&
+                <>
+                    <DataTable
+                        data={projectData}
+                        columns={projectColumns}
+                        getRowKey={(project) => project.id}
+                        onRowClick={(project) => navigate(`/organization/${orgId}/project/${project.id}`)}
+                    />
+                </>
+                }
             </div>
 
             {user?.id === organizationData.owner?.id && (

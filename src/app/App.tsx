@@ -18,7 +18,6 @@ import { SingleOrganizationView } from '@/views/management/organization/SingleOr
 import { SingleOrganizationEditView } from '@/views/management/organization/OrganizationEditView';
 import { SingleOrganizationCreateView } from '@/views/management/organization/OrganizationCreateView';
 
-import { ProjectsView } from '@/views/management/projects/ProjectsView';
 import { ProjectCreateView } from '@/views/management/projects/ProjectCreateView';
 import { ProjectEditView } from '@/views/management/projects/ProjectEditView';
 import { SingleProjectView } from '@/views/management/projects/SingleProjectView';
@@ -54,7 +53,6 @@ export default function App() {
             <Route path="/organization/:orgId/edit" element={<SingleOrganizationEditView />} />
             <Route path="/organization/create" element={<SingleOrganizationCreateView />} />
 
-            <Route path="/organization/:orgId/projects" element={<ProjectsView />} />
             <Route path="/organization/:orgId/projects/create" element={<ProjectCreateView />} />
             <Route path="/organization/:orgId/project/:projId" element={<SingleProjectView />} />
             <Route path="/organization/:orgId/project/:projId/edit" element={<ProjectEditView />} />

@@ -12,13 +12,14 @@ export const InviteMember = ({ organizationId, onClose }: {
 }) => {
     const [receiverEmail, setReceiverEmail] = useState<string>('');
     const [successMessage, setSuccessMessage] = useState<string>('');
+    const [isLoading, setIsLoading] = useState(false);
     const [errors, setErrors] = useState<InviteErrors>({
             inviteEmailError: '',
     });
 
         const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
+        setSuccessMessage('');
         const newErrors: InviteErrors = {
             inviteEmailError: '',
         };
@@ -33,7 +34,8 @@ export const InviteMember = ({ organizationId, onClose }: {
         setErrors(newErrors);
 
         if (newErrors.inviteEmailError) return;
-        try {  
+        try { 
+            setIsLoading(true);
             const response = await sendMailRequest(Number(organizationId), receiverEmail);
             setSuccessMessage(response.message);
         } catch (error: any) {
@@ -43,6 +45,8 @@ export const InviteMember = ({ organizationId, onClose }: {
                     inviteEmailError: laravelErrors.message ?? '',
                 });
             }
+        } finally {
+            setIsLoading(false);
         }
     }
 
@@ -69,7 +73,8 @@ export const InviteMember = ({ organizationId, onClose }: {
                     </div>
                     <button type="submit" id='login-form-submit' name='login-form-submit' className='px-4 py-2 bg-primary text-white rounded transform-all duration-300 hover:opacity-90 hover:cursor-pointer'>Send Invite</button>
                 </form>
-                <p className='text-green font-light text-xl'>{successMessage}</p>
+                <p className='text-green-400 font-light text-xl'>{successMessage}</p>
+                {isLoading && <p>Inviting... please wait.</p>}
             </div>
         </div>
     );

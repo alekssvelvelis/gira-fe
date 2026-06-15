@@ -173,7 +173,7 @@ export const TaskEditView = () => {
                     </button>
                     <div>
                         <p className='text-lg  mb-0.5'>Currently Editing:</p>
-                        <p className='text-xl font-medium font-mono'>{singleTask.id}</p>
+                        <p className='text-xl font-medium font-mono'>Task: {singleTask.id} for {singleTask.project?.project_name}</p>
                     </div>
                 </div>
             </div>

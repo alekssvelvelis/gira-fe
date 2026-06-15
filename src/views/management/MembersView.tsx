@@ -60,7 +60,7 @@ export const MemberView = () => {
                             </button>
                             <div>
                                 <p className='text-lg mb-0.5'>Currently viewing members of:</p>
-                                <p className='text-xl font-medium'>{orgId}</p>
+                                <p className='text-xl font-medium'>Organization ID: {orgId}</p>
                             </div>
                         </div>
                     </div>

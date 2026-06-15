@@ -115,27 +115,36 @@ export const Dashboard = () => {
                     <h1 className='text-xl md:text-3xl font-light'>{user ? `Welcome, ${user.nickname}` : 'Welcome!'}</h1>
                 </div>
                 <div>
-                    <h1 className='text-3xl font-light'>Your closest due tasks</h1>
-                    <DataTable
-                        data={closestDueTasks}
-                        columns={taskColumns}
-                        getRowKey={(task) => task.id}
-                        onRowClick={(task) => navigate(`/organization/${task.project?.organization_id}/project/${task.project?.id}/tasks/${task.id}`)}
-                    />
-                </div>
-                <div>
-                    <h1 className='text-3xl font-light'>Your calendar</h1>
-                    {sortedMonths.map(month => (
-                        <div key={month}>
-                            <h2 className='text-xl font-semibold mb-2'>{formatYearMonth(month)}</h2>
+                    {userTasks.length === 0 &&
+                        <div className='my-4'>
+                            <h1 className='text-3xl text-center'>You have no assigned tasks right now!</h1>
+                        </div>
+                    }
+                    {userTasks.length >= 1 &&
+                        <div>
+                            <h1 className='text-3xl font-light'>Your closest due tasks</h1>
                             <DataTable
-                                data={grouped[month]}
+                                data={closestDueTasks}
                                 columns={taskColumns}
                                 getRowKey={(task) => task.id}
                                 onRowClick={(task) => navigate(`/organization/${task.project?.organization_id}/project/${task.project?.id}/tasks/${task.id}`)}
                             />
+                            <div>
+                                <h1 className='text-3xl font-light'>Your calendar</h1>
+                                {sortedMonths.map(month => (
+                                    <div key={month}>
+                                        <h2 className='text-xl font-semibold mb-2'>{formatYearMonth(month)}</h2>
+                                        <DataTable
+                                            data={grouped[month]}
+                                            columns={taskColumns}
+                                            getRowKey={(task) => task.id}
+                                            onRowClick={(task) => navigate(`/organization/${task.project?.organization_id}/project/${task.project?.id}/tasks/${task.id}`)}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                    ))}
+                    }
                 </div>
             </div>
         </div>
